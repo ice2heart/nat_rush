@@ -5,6 +5,7 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QList>
+#include <common.h>
 
 class RawServer : public QObject
 {
@@ -14,17 +15,17 @@ public:
     ~RawServer();
 
 signals:
-    void newData(int size, char *data);
+    void newData(const QByteArray &data);
 public slots:
     void newConnection();
 
     void readyRead();
     void disconnected();
-    void incomingData(int size, char *data);
+    void incomingData(const QByteArray &data);
 private:
     QTcpServer *mServer;
     QList<QTcpSocket*> mSockets;
-    char buf[2000];
+    char buf[BUFSIZE];
 };
 
 #endif // RAWSERVER_H

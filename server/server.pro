@@ -14,6 +14,7 @@ CONFIG   -= app_bundle
 
 TEMPLATE = app
 
+INCLUDEPATH += ../common
 
 SOURCES += main.cpp \
     coreserver.cpp \

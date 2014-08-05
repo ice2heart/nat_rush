@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QTcpSocket>
+#include <common.h>
 
 class RawClient : public QObject
 {
@@ -11,14 +12,14 @@ public:
     explicit RawClient(QObject *parent = 0);
     
 signals:
-    void newData(char *data, int len);
+    void newData(const QByteArray &data);
 public slots:
     void connected();
     void readyRead();
-    void sendRawData(char *data, int len);
+    void sendRawData(const QByteArray &data);
 private:
     QTcpSocket *mSocket;
-    char buf[2000];
+    char buf[BUFSIZE];
 };
 
 #endif // RAWCLIENT_H

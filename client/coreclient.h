@@ -18,7 +18,7 @@ public slots:
     void connected();
     void readyRead();
     void test();
-    void incomingData(char *data, int len);
+    void incomingData(const QByteArray &data);
 private:
     QTcpSocket *mMainSocket;
     quint64 mNextBlockSize;

@@ -6,7 +6,18 @@
 #include <QTcpSocket>
 #include <QDataStream>
 #include <QMap>
+#include <QSharedPointer>
 #include "rawserver.h"
+
+class ConnectionStorage
+{
+public:
+    ConnectionStorage();
+    ~ConnectionStorage();
+    quint64 mNextBlockSize;
+    RawServer *mRawServer;
+};
+typedef QSharedPointer<ConnectionStorage> sConStore;
 
 class CoreServer : public QObject
 {
@@ -23,13 +34,12 @@ public slots:
     void readyRead();
     void disconnected();
     void sendText(QTcpSocket *socket, const QString &text);
-    void sendRawData(QTcpSocket *socket, int bufsize, char *buf);
-    void incomingRawData(int size, char *data);
+    //void sendRawData(QTcpSocket *socket, int bufsize, char *buf);
+    void incomingRawData(const QByteArray &data);
 
 private:
     QTcpServer *mMainServer;
-    QMap<QTcpSocket*, quint64> mCoreClients;
-    RawServer *mRawServer;
+    QMap<QTcpSocket*, sConStore> mCoreClients;
 };
 
 #endif // CORESERVER_H

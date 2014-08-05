@@ -1,5 +1,6 @@
 #include "coreserver.h"
 #include <QDebug>
+#include <common.h>
 
 CoreServer::CoreServer(QObject *parent) :
     QObject(parent)
@@ -10,47 +11,46 @@ CoreServer::CoreServer(QObject *parent) :
         qWarning()<<"Server start failure";
     }
     connect(mMainServer, SIGNAL(newConnection()), this, SLOT(newConnection()));
-    //сделать мультиюзер
-    mRawServer = new RawServer(this);
     qDebug()<<"Ready!";
 }
 
 void CoreServer::newConnection()
 {
     QTcpSocket *newClient = mMainServer->nextPendingConnection();
-    mCoreClients.insert(newClient, 0);
+
+    mCoreClients.insert(newClient, QSharedPointer<ConnectionStorage>(new ConnectionStorage()));
     connect(newClient, SIGNAL(disconnected()), this, SLOT(disconnected()));
     connect(newClient, SIGNAL(readyRead()), this, SLOT(readyRead()));
-
-    connect(mRawServer, SIGNAL(newData(int,char*)), this, SLOT(incomingRawData(int,char*)));
+    sConStore client = mCoreClients[newClient];
+    connect(client->mRawServer, SIGNAL(newData(QByteArray)), this, SLOT(incomingRawData(QByteArray)));
 }
 
 void CoreServer::readyRead()
 {
     QTcpSocket *socket = (QTcpSocket *) sender();
-    quint64 mNextBlockSize = mCoreClients[socket];
+    sConStore tmpCon = mCoreClients[socket];
 
     QDataStream in(socket);
     in.setVersion(QDataStream::Qt_4_6);
     for(;;)
     {
-        if (!mNextBlockSize)
+        if (!tmpCon->mNextBlockSize)
         {
             if(socket->bytesAvailable() < sizeof(quint64))
                 break;
-            in >> mNextBlockSize;
+            in >> tmpCon->mNextBlockSize;
 
         }
 
-        if (socket->bytesAvailable() < mNextBlockSize)
+        if (socket->bytesAvailable() < tmpCon->mNextBlockSize)
             break;
 
         quint8 command;
         in >> command;
         static int ii = 0;
         quint64 bSize;
-        //тут надо поправить
-        char bbuf[2000];
+        QByteArray tempBa;
+        qDebug()<<"command"<<command;
         switch (command) {
         case 1:
             qDebug()<<"Command"<<command;
@@ -60,14 +60,14 @@ void CoreServer::readyRead()
             break;
         case 99:
             in >> bSize;
-            in.readRawData(bbuf, bSize);
-            mRawServer->incomingData(bSize, bbuf);
+            in >> tempBa;
+            qDebug()<<"New raw data"<<tempBa;
+            tmpCon->mRawServer->incomingData(tempBa);
         default:
             break;
         }
-        mNextBlockSize = 0;
+        tmpCon->mNextBlockSize = 0;
     }
-    mCoreClients[socket] = mNextBlockSize;
 }
 
 void CoreServer::disconnected()
@@ -90,24 +90,29 @@ void CoreServer::sendText(QTcpSocket *socket, const QString &text)
     socket->write(dataBlock);
 }
 
-void CoreServer::sendRawData(QTcpSocket *socket, int bufsize, char *buf)
-{
-    QByteArray dataBlock;
-    QDataStream out(&dataBlock, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_4_6);
-
-    out << quint64(0) << quint8(99)<<quint64(bufsize);
-    out.writeRawData(buf, bufsize);
-
-    out.device()->seek(0);
-    out << quint64(dataBlock.size() - sizeof(quint64));
-
-    socket->write(dataBlock);
-}
-
-void CoreServer::incomingRawData(int size, char *data)
+void CoreServer::incomingRawData(const QByteArray &data)
 {
     foreach (QTcpSocket *socket, mCoreClients.keys()) {
-        sendRawData(socket, size, data);
-    }
+        QByteArray dataBlock;
+        QDataStream out(&dataBlock, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_6);
+
+        out << quint64(0) << quint8(99)<<quint64(0); //0 заменить на что то полезное
+        out << data;
+        out.device()->seek(0);
+        out << quint64(dataBlock.size() - sizeof(quint64));
+
+        socket->write(dataBlock);
+        }
+}
+
+
+ConnectionStorage::ConnectionStorage()
+{
+    mRawServer = new RawServer();
+}
+
+ConnectionStorage::~ConnectionStorage()
+{
+    delete mRawServer;
 }

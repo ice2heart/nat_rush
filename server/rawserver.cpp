@@ -10,6 +10,7 @@ RawServer::RawServer(QObject *parent) :
     {
         qWarning()<<"Server start failure";
     }
+    qDebug()<<"Raw server start "<< 8000;
     connect(mServer, SIGNAL(newConnection()), this, SLOT(newConnection()));
 }
 
@@ -34,8 +35,23 @@ void RawServer::readyRead()
         return;
     QDataStream in(socket);
     quint64 ba = socket->bytesAvailable();
-    in.readRawData(buf, ba);
-    emit newData(ba, buf);
+    QByteArray temp;
+    while (ba != 0)
+    {
+        if (ba > BUFSIZE)
+        {
+            in.readRawData(buf, BUFSIZE);
+            ba -= BUFSIZE;
+            temp.append(buf, BUFSIZE);
+        }
+        else
+        {
+            in.readRawData(buf, ba);
+            temp.append(buf, ba);
+            ba = 0;
+        }
+    }
+    emit newData(temp);
 }
 
 void RawServer::disconnected()
@@ -45,7 +61,7 @@ void RawServer::disconnected()
     //надо бы сделать нормальный дисконект наверное disconnect()
 }
 
-void RawServer::incomingData(int size, char *data)
+/*void RawServer::incomingData(int size, char *data)
 {
     qDebug()<<"raw server incoming data";
     QByteArray dataBlock;
@@ -54,5 +70,13 @@ void RawServer::incomingData(int size, char *data)
     foreach (QTcpSocket *s, mSockets) {
         qDebug()<<QString::fromLocal8Bit(data, size);
         s->write(dataBlock);
+    }
+}
+*/
+void RawServer::incomingData(const QByteArray &data)
+{
+    foreach (QTcpSocket *s, mSockets) {
+        qDebug()<<QString::fromLocal8Bit(data);
+        s->write(data);
     }
 }

@@ -1,6 +1,7 @@
 #include "coreclient.h"
 #include <QDebug>
 #include <QTimer>
+#include <common.h>
 
 CoreClient::CoreClient(QObject *parent) :
     QObject(parent)
@@ -16,7 +17,7 @@ CoreClient::CoreClient(QObject *parent) :
 void CoreClient::connected()
 {
     mRawClient = new RawClient(this);
-    connect(mRawClient, SIGNAL(newData(char*,int)), this, SLOT(incomingData(char*,int)));
+    connect(mRawClient, SIGNAL(newData(QByteArray)), this, SLOT(incomingData(QByteArray)));
 
 }
 
@@ -39,7 +40,7 @@ void CoreClient::readyRead()
         QString text;
         quint8 number;
         in >> number;
-        char ss[2000];
+        QByteArray tempBa;
         quint64 buffsize;
         if (number == 1)
         {
@@ -50,9 +51,9 @@ void CoreClient::readyRead()
         else
         {
             in >> buffsize;
-            in.readRawData(ss, buffsize);
-            mRawClient->sendRawData(ss, buffsize);
-            qDebug()<<"rawdata"<<QString::fromLocal8Bit(ss);
+            in >> tempBa;
+            mRawClient->sendRawData(tempBa);
+            qDebug()<<"rawdata"<<QString::fromLocal8Bit(tempBa);
             //
         }
         mNextBlockSize = 0;
@@ -72,11 +73,12 @@ void CoreClient::test()
     out.device()->seek(0);
     out << quint64(dataBlock.size() - sizeof(quint64));
 
-    qDebug()<<"pClient: send byte" << dataBlock.size();
+    qDebug()<<"client: send byte" << dataBlock.size();
     mMainSocket->write(dataBlock);
 }
 
-void CoreClient::incomingData(char *data, int len)
+
+void CoreClient::incomingData(const QByteArray &data)
 {
     if (!mMainSocket)
         return;
@@ -84,11 +86,11 @@ void CoreClient::incomingData(char *data, int len)
     QByteArray dataBlock;
     QDataStream out(&dataBlock, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_4_6);
-    out << quint64(0) << quint8(99)<<quint64(len);
-    out.writeRawData(data, len);
+    out << quint64(0) << quint8(99)<<quint64(0); //поправить формат сереализации
+    out << data;
     out.device()->seek(0);
     out << quint64(dataBlock.size() - sizeof(quint64));
 
-    qDebug()<<"pClient: send byte" << dataBlock.size();
+    qDebug()<<"client: send byte" << dataBlock.size();
     mMainSocket->write(dataBlock);
 }

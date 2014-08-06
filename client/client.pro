@@ -14,12 +14,14 @@ CONFIG   -= app_bundle
 
 TEMPLATE = app
 
-INCLUDEPATH += ../common
+#INCLUDEPATH += ../common
 
 SOURCES += main.cpp \
     coreclient.cpp \
-    rawclient.cpp
+    rawclient.cpp \
+    common.cpp
 
 HEADERS += \
     coreclient.h \
-    rawclient.h
+    rawclient.h \
+    common.h

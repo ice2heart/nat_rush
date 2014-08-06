@@ -9,37 +9,42 @@
 #include <QSharedPointer>
 #include "rawserver.h"
 
-class ConnectionStorage
+class ConnectionStorage : public QObject
 {
+	Q_OBJECT
 public:
-    ConnectionStorage();
-    ~ConnectionStorage();
-    quint64 mNextBlockSize;
-    RawServer *mRawServer;
+	ConnectionStorage(QObject *parent = 0);
+	~ConnectionStorage();
+	quint64 mNextBlockSize;
+	RawServer *mRawServer;
+	QTcpSocket *mSocket;
+public slots:
+	void rawClientIn(quint8 id);
+	void rawClientOut(quint8 id);
 };
+
 typedef QSharedPointer<ConnectionStorage> sConStore;
 
 class CoreServer : public QObject
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    explicit CoreServer(QObject *parent = 0);
-    
+	explicit CoreServer(QObject *parent = 0);
+
 signals:
 
-    
-public slots:
-    void newConnection();
 
-    void readyRead();
-    void disconnected();
-    void sendText(QTcpSocket *socket, const QString &text);
-    //void sendRawData(QTcpSocket *socket, int bufsize, char *buf);
-    void incomingRawData(const QByteArray &data);
+public slots:
+	void newConnection();
+	void readyRead();
+	void disconnected();
+	void sendText(QTcpSocket *socket, const QString &text);
+	//void sendRawData(QTcpSocket *socket, int bufsize, char *buf);
+	void incomingRawData(quint8 id, const QByteArray &data);
 
 private:
-    QTcpServer *mMainServer;
-    QMap<QTcpSocket*, sConStore> mCoreClients;
+	QTcpServer *mMainServer;
+	QMap<QTcpSocket*, sConStore> mCoreClients;
 };
 
 #endif // CORESERVER_H

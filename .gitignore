@@ -1,0 +1,5 @@
+*.pro.user
+Makefile
+moc_*.cpp
+moc_*.o
+*.o

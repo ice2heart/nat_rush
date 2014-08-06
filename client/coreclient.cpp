@@ -1,7 +1,7 @@
 #include "coreclient.h"
 #include <QDebug>
 #include <QTimer>
-#include "common.h"
+#include "../common/common.h"
 
 CoreClient::CoreClient(QObject *parent) :
 	QObject(parent)

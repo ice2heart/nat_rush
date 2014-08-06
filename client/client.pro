@@ -19,9 +19,9 @@ TEMPLATE = app
 SOURCES += main.cpp \
     coreclient.cpp \
     rawclient.cpp \
-    common.cpp
+    ../common/common.cpp
 
 HEADERS += \
     coreclient.h \
     rawclient.h \
-    common.h
+    ../common/common.h

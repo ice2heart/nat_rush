@@ -1,7 +1,7 @@
 #include "rawserver.h"
 #include <QDataStream>
 #include <QDebug>
-#include "common.h"
+#include "../common/common.h"
 
 RawServer::RawServer(QObject *parent) :
 	QObject(parent)

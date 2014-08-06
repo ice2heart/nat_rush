@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QTcpSocket>
-#include "common.h"
+#include "../common/common.h"
 
 class RawClient : public QObject
 {

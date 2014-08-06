@@ -2,6 +2,7 @@
 #define COMMON_H
 
 #include <QByteArray>
+#include <QDataStream>
 #include <QTcpSocket>
 
 const static quint32 BUFSIZE = 5000;

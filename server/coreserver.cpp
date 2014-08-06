@@ -1,6 +1,6 @@
 #include "coreserver.h"
 #include <QDebug>
-#include "common.h"
+#include "../common/common.h"
 
 CoreServer::CoreServer(QObject *parent) :
 	QObject(parent)
@@ -22,6 +22,7 @@ void CoreServer::newConnection()
 	connect(newClient, SIGNAL(disconnected()), this, SLOT(disconnected()));
 	connect(newClient, SIGNAL(readyRead()), this, SLOT(readyRead()));
 	sConStore client = mCoreClients[newClient];
+	client->mNextBlockSize = 0;
 	client->mSocket = newClient;
 	connect(client->mRawServer, SIGNAL(newData(quint8,QByteArray)), this, SLOT(incomingRawData(quint8,QByteArray)));
 	connect(client->mRawServer, SIGNAL(clientIn(quint8)), client.data(), SLOT(rawClientIn(quint8)));
@@ -33,6 +34,7 @@ void CoreServer::readyRead()
 	QTcpSocket *socket = (QTcpSocket *) sender();
 	sConStore tmpCon = mCoreClients[socket];
 
+	qDebug()<<"Main server read data"<<tmpCon->mNextBlockSize;
 	QDataStream in(socket);
 	in.setVersion(QDataStream::Qt_4_6);
 	for(;;)

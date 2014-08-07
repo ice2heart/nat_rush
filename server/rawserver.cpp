@@ -35,6 +35,11 @@ void RawServer::newConnection()
 void RawServer::readyRead()
 {
 	QTcpSocket *socket = (QTcpSocket *) sender();
+	if (!socket)
+	{
+		qWarning()<<"RawServer write to empty socket";
+		return;
+	}
 	if (socket->bytesAvailable() <= 0)
 		return;
 	QDataStream in(socket);

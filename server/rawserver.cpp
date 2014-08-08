@@ -75,6 +75,6 @@ void RawServer::incomingData(quint8 clientId, const QByteArray &data)
 {
 	QTcpSocket *s = mSockets.key(clientId);
 	qDebug()<<"Raw server Incoming data"<<data.length();
-	if (s->isOpen())
+	if (s)
 		s->write(data);
 }

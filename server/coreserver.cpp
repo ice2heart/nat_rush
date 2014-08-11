@@ -1,16 +1,18 @@
 #include "coreserver.h"
 #include <QDebug>
-#include "../common/common.h"
 
-CoreServer::CoreServer(QObject *parent) :
-	QObject(parent)
+CoreServer::CoreServer(QObject *parent)
+	:QObject(parent)
+	,mIntPool()
 {
 	mMainServer = new QTcpServer(this);
+	for (quint8 i = 0; i<50; i++)
+		mIntPool.addItem(i);
+	connect(mMainServer, SIGNAL(newConnection()), this, SLOT(newConnection()));
 	if (!mMainServer->listen(QHostAddress::Any,6900))
 	{
 		qWarning()<<"Server start failure";
 	}
-	connect(mMainServer, SIGNAL(newConnection()), this, SLOT(newConnection()));
 	qDebug()<<"Ready!";
 }
 
@@ -18,7 +20,7 @@ void CoreServer::newConnection()
 {
 	QTcpSocket *newClient = mMainServer->nextPendingConnection();
 
-	mCoreClients.insert(newClient, QSharedPointer<ConnectionStorage>(new ConnectionStorage()));
+	mCoreClients.insert(newClient, sConStore(new ConnectionStorage(mIntPool.acquire())));
 	connect(newClient, SIGNAL(disconnected()), this, SLOT(disconnected()));
 	connect(newClient, SIGNAL(readyRead()), this, SLOT(readyRead()));
 	sConStore client = mCoreClients[newClient];
@@ -53,7 +55,6 @@ void CoreServer::readyRead()
 		quint8 command;
 		in >> command;
 		static int ii = 0;
-		quint64 bSize;
 		quint8 conNum;
 		QByteArray tempBa;
 		qDebug()<<"command"<<command;
@@ -111,17 +112,18 @@ void CoreServer::incomingRawData(quint8 id, const QByteArray &data)
 	}
 }
 
-ConnectionStorage::ConnectionStorage(QObject *parent)
+ConnectionStorage::ConnectionStorage(intPool::spItem portShift, QObject *parent)
 	:QObject(parent)
+	,mPortShift(portShift)
 {
-	mRawServer = new RawServer();
+
+	mRawServer = new RawServer((*mPortShift)+8000, this);
 }
 
 ConnectionStorage::~ConnectionStorage()
 {
 	delete mRawServer;
 }
-
 void ConnectionStorage::rawClientIn(quint8 id)
 {
 	qDebug()<<"Client in"<<id;

@@ -11,7 +11,7 @@ class RawServer : public QObject
 {
 	Q_OBJECT
 public:
-	explicit RawServer(QObject *parent = 0);
+	explicit RawServer(quint32 port, QObject *parent = 0);
 	~RawServer();
 
 signals:
@@ -28,6 +28,7 @@ private:
 	QTcpServer *mServer;
 	QMap<QTcpSocket*, quint8> mSockets;
 	char *buf;
+	quint32 mPort;
 };
 
 #endif // RAWSERVER_H

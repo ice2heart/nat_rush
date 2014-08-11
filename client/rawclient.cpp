@@ -8,12 +8,13 @@ RawClient::RawClient(quint8 id, QObject *parent) :
 	mSocket = new QTcpSocket(this);
 	//mSocket->connectToHost("127.0.0.1", 5000);
 	//mSocket->connectToHost("ya.ru", 80);
-	//mSocket->connectToHost("127.0.0.1", 5900);
+
 
 	connect(mSocket, SIGNAL(connected()), this, SLOT(connected()));
 	connect(mSocket, SIGNAL(readyRead()), this, SLOT(readyRead()));
 	//mSocket->connectToHost("192.168.1.100", 6600); //home mdp
-	mSocket->connectToHost("192.168.1.100", 5900);
+	//mSocket->connectToHost("192.168.1.100", 5900);
+	mSocket->connectToHost("127.0.0.1", 5900);
 }
 
 RawClient::~RawClient()

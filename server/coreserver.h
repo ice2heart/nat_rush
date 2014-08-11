@@ -1,6 +1,8 @@
 #ifndef CORESERVER_H
 #define CORESERVER_H
 
+
+#include "../common/common.h"
 #include <QObject>
 #include <QTcpServer>
 #include <QTcpSocket>
@@ -13,7 +15,7 @@ class ConnectionStorage : public QObject
 {
 	Q_OBJECT
 public:
-	ConnectionStorage(QObject *parent = 0);
+	ConnectionStorage(intPool::spItem portShift, QObject *parent = 0);
 	~ConnectionStorage();
 	quint64 mNextBlockSize;
 	RawServer *mRawServer;
@@ -21,9 +23,12 @@ public:
 public slots:
 	void rawClientIn(quint8 id);
 	void rawClientOut(quint8 id);
+private:
+	intPool::spItem mPortShift;
 };
 
 typedef QSharedPointer<ConnectionStorage> sConStore;
+
 
 class CoreServer : public QObject
 {
@@ -45,6 +50,7 @@ public slots:
 private:
 	QTcpServer *mMainServer;
 	QMap<QTcpSocket*, sConStore> mCoreClients;
+	intPool mIntPool;
 };
 
 #endif // CORESERVER_H

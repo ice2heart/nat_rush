@@ -1,18 +1,19 @@
+#include "../common/common.h"
 #include "rawserver.h"
 #include <QDataStream>
 #include <QDebug>
-#include "../common/common.h"
 
-RawServer::RawServer(QObject *parent) :
-	QObject(parent)
+RawServer::RawServer(quint32 port, QObject *parent)
+	:QObject(parent)
+	,mPort(port)
 {
 	buf = new char[BUFSIZE]();
 	mServer = new QTcpServer(this);
-	if (!mServer->listen(QHostAddress::Any,8000))
+	if (!mServer->listen(QHostAddress::Any,port))
 	{
 		qWarning()<<"Server start failure";
 	}
-	qDebug()<<"Raw server start "<< 8000;
+	qDebug()<<"Raw server start "<< mPort;
 	connect(mServer, SIGNAL(newConnection()), this, SLOT(newConnection()));
 }
 

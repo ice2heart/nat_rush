@@ -22,6 +22,7 @@ public slots:
 	void incomingData(quint8 id, const QByteArray &data);
 	void clientIn(quint8 id);
 	void clientOut(quint8 id);
+	void disconnected();
 private:
 	QTcpSocket *mMainSocket;
 	quint64 mNextBlockSize;

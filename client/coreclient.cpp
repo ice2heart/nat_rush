@@ -9,8 +9,8 @@ CoreClient::CoreClient(QObject *parent) :
 	//mNextblock Надо вынести в мапку
 	mNextBlockSize = 0;
 	mMainSocket = new QTcpSocket(this);
-	//mMainSocket->connectToHost("178.62.189.199", 6900);
-	mMainSocket->connectToHost("127.0.0.1", 6900);
+	mMainSocket->connectToHost("178.62.189.199", 6900);
+	//mMainSocket->connectToHost("127.0.0.1", 6900);
 	connect(mMainSocket, SIGNAL(connected()), this, SLOT(connected()));
 	connect(mMainSocket, SIGNAL(readyRead()), this, SLOT(readyRead()));
 	connect(mMainSocket, SIGNAL(disconnected()), this, SLOT(disconnected()));

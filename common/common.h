@@ -16,6 +16,9 @@ namespace NR {
 void writeToSocket(QTcpSocket *client, quint8 type, const QByteArray &qba);
 void writeToSocket(QTcpSocket *client, quint8 type, quint8 data);
 
+void Log(const QString &msg, quint8 logLvl = 0);
+void SetLogLvl(quint8 logLvl);
+
 template <class T> class Pool
 {
 public:

@@ -1,5 +1,4 @@
 #include "coreserver.h"
-#include <QDebug>
 
 CoreServer::CoreServer(QObject *parent)
 	:QObject(parent)
@@ -13,7 +12,7 @@ CoreServer::CoreServer(QObject *parent)
 	{
 		qWarning()<<"Server start failure";
 	}
-	qDebug()<<"Ready!";
+	NR::Log("Ready!");
 }
 
 void CoreServer::newConnection()
@@ -36,7 +35,7 @@ void CoreServer::readyRead()
 	QTcpSocket *socket = (QTcpSocket *) sender();
 	sConStore tmpCon = mCoreClients[socket];
 
-	qDebug()<<"Main server read data"<<tmpCon->mNextBlockSize;
+	NR::Log(QString("Main server read data %1").arg(tmpCon->mNextBlockSize), 6);
 	QDataStream in(socket);
 	in.setVersion(QDataStream::Qt_4_6);
 	for(;;)
@@ -57,16 +56,15 @@ void CoreServer::readyRead()
 		static int ii = 0;
 		quint8 conNum;
 		QByteArray tempBa;
-		qDebug()<<"command"<<command;
+		NR::Log(QString("command %1").arg(command), 3);
 		switch (command) {
 		case 1:
-			qDebug()<<"Command"<<command;
 			sendText(socket, QString::number(++ii));
 			break;
 		case 99:
 			in >> conNum;
 			in >> tempBa;
-			qDebug()<<"New raw data"<<tempBa.length();
+			NR::Log(QString("New raw data length %1").arg(tempBa.length()), 6);
 			tmpCon->mRawServer->incomingData(conNum, tempBa);
 			break;
 		default:
@@ -126,12 +124,12 @@ ConnectionStorage::~ConnectionStorage()
 }
 void ConnectionStorage::rawClientIn(quint8 id)
 {
-	qDebug()<<"Client in"<<id;
+	NR::Log(QString("Client in").arg(id), 3);
 	NR::writeToSocket(mSocket,CLIENTIN, id);
 }
 
 void ConnectionStorage::rawClientOut(quint8 id)
 {
-	qDebug()<<"Client out"<<id;
+	NR::Log(QString("Client out").arg(id), 3);
 	NR::writeToSocket(mSocket,CLIENTOUT, id);
 }

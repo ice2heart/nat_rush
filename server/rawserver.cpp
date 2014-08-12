@@ -1,7 +1,6 @@
 #include "../common/common.h"
 #include "rawserver.h"
 #include <QDataStream>
-#include <QDebug>
 
 RawServer::RawServer(quint32 port, QObject *parent)
 	:QObject(parent)
@@ -13,18 +12,18 @@ RawServer::RawServer(quint32 port, QObject *parent)
 	{
 		qWarning()<<"Server start failure";
 	}
-	qDebug()<<"Raw server start "<< mPort;
+	NR::Log(QString("Raw server start %1").arg(mPort), 0);
 	connect(mServer, SIGNAL(newConnection()), this, SLOT(newConnection()));
 }
 
 RawServer::~RawServer()
 {
-	qDebug()<<"Destroy raw server";
+	NR::Log("Destroy raw server");
 }
 
 void RawServer::newConnection()
 {
-	qDebug()<<"New connection";
+	NR::Log("New connection", 3);
 	QTcpSocket *newClient = mServer->nextPendingConnection();
 	static int counter = 0;
 	mSockets.insert(newClient, ++counter);
@@ -75,7 +74,7 @@ void RawServer::disconnected()
 void RawServer::incomingData(quint8 clientId, const QByteArray &data)
 {
 	QTcpSocket *s = mSockets.key(clientId);
-	qDebug()<<"Raw server Incoming data"<<data.length();
+	NR::Log(QString("Raw server incoming data length %1").arg(data.length()), 6);
 	if (s)
 		s->write(data);
 }

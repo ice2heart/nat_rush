@@ -1,4 +1,7 @@
 #include "common.h"
+#include <QDebug>
+
+static quint8 gLogLvl = 0;
 
 namespace NR {
 
@@ -21,22 +24,19 @@ void writeToSocket(QTcpSocket *client, quint8 type, quint8 data)
 	out << quint8(data);
 	writeToSocket(client, type, dataBlock);
 }
-/*
-template <class T> void Pool<T>::addItem(T item)
+
+void SetLogLvl(quint8 logLvl)
 {
-	mPool.insert(QSharedPointer<T>(new T(item)), -1);
+	gLogLvl = logLvl;
 }
 
-template <class T> typename Pool<T>::spItem Pool<T>::acquire()
+void Log(const QString &msg, quint8 logLvl)
 {
-	spItem item = mPool.key(-1);
-	mPool.insert(item, 1);
-	return item;
+	if (logLvl >= gLogLvl)
+		qDebug()<<msg;
 }
 
-template <class T> void Pool<T>::release(spItem item)
-{
-	mPool.insert(item, -1);
-}*/
+
+
 }
 

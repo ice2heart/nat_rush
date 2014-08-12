@@ -1,7 +1,6 @@
 #ifndef RAWSERVER_H
 #define RAWSERVER_H
 
-#include <QObject>
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QMap>

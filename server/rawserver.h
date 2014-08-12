@@ -1,9 +1,8 @@
 #ifndef RAWSERVER_H
 #define RAWSERVER_H
 
+#include "../common/common.h"
 #include <QTcpServer>
-#include <QTcpSocket>
-#include <QMap>
 
 
 class RawServer : public QObject

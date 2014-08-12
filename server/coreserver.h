@@ -3,12 +3,8 @@
 
 
 #include "../common/common.h"
-#include <QObject>
 #include <QTcpServer>
-#include <QTcpSocket>
-#include <QDataStream>
 #include <QMap>
-#include <QSharedPointer>
 #include "rawserver.h"
 
 class ConnectionStorage : public QObject
@@ -23,6 +19,7 @@ public:
 public slots:
 	void rawClientIn(quint8 id);
 	void rawClientOut(quint8 id);
+	void incomingData(quint8 clientId, const QByteArray &data);
 private:
 	intPool::spItem mPortShift;
 };
@@ -35,18 +32,12 @@ class CoreServer : public QObject
 	Q_OBJECT
 public:
 	explicit CoreServer(QObject *parent = 0);
-
 signals:
-
-
 public slots:
 	void newConnection();
 	void readyRead();
 	void disconnected();
 	void sendText(QTcpSocket *socket, const QString &text);
-	//void sendRawData(QTcpSocket *socket, int bufsize, char *buf);
-	void incomingRawData(quint8 id, const QByteArray &data);
-
 private:
 	QTcpServer *mMainServer;
 	QMap<QTcpSocket*, sConStore> mCoreClients;

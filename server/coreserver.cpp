@@ -124,12 +124,12 @@ ConnectionStorage::~ConnectionStorage()
 }
 void ConnectionStorage::rawClientIn(quint8 id)
 {
-	NR::Log(QString("Client in").arg(id), 3);
+	NR::Log(QString("Client in %1").arg(id), 3);
 	NR::writeToSocket(mSocket,CLIENTIN, id);
 }
 
 void ConnectionStorage::rawClientOut(quint8 id)
 {
-	NR::Log(QString("Client out").arg(id), 3);
+	NR::Log(QString("Client out %1").arg(id), 3);
 	NR::writeToSocket(mSocket,CLIENTOUT, id);
 }

@@ -18,7 +18,7 @@ RawServer::RawServer(quint32 port, QObject *parent)
 
 RawServer::~RawServer()
 {
-	NR::Log("Destroy raw server");
+	NR::Log("Destroy raw server", 3);
 }
 
 void RawServer::newConnection()

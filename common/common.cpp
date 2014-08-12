@@ -32,7 +32,7 @@ void SetLogLvl(quint8 logLvl)
 
 void Log(const QString &msg, quint8 logLvl)
 {
-	if (logLvl >= gLogLvl)
+	if (logLvl <= gLogLvl)
 		qDebug()<<msg;
 }
 

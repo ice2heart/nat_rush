@@ -2,15 +2,21 @@
 #include <QDebug>
 #include <QTimer>
 #include "../common/common.h"
+#include <QSettings>
 
 CoreClient::CoreClient(QObject *parent) :
 	QObject(parent)
 {
 	//mNextblock Надо вынести в мапку
+
+	QSettings setting("config.ini", QSettings::IniFormat);
+	QString address = setting.value("address", QString("178.62.189.199")).toString();
+	quint16 port = setting.value("port", 6900).toUInt();
+	setting.sync();
+	NR::Log(QString("Connect to %1:%2").arg(address).arg(port));
 	mNextBlockSize = 0;
 	mMainSocket = new QTcpSocket(this);
-	mMainSocket->connectToHost("178.62.189.199", 6900);
-	//mMainSocket->connectToHost("127.0.0.1", 6900);
+	mMainSocket->connectToHost(address, port);
 	connect(mMainSocket, SIGNAL(connected()), this, SLOT(connected()));
 	connect(mMainSocket, SIGNAL(readyRead()), this, SLOT(readyRead()));
 	connect(mMainSocket, SIGNAL(disconnected()), this, SLOT(disconnected()));

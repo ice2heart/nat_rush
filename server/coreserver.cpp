@@ -57,7 +57,7 @@ void CoreServer::readyRead()
 		static int ii = 0;
 		quint8 conNum;
 		QByteArray tempBa;
-		NR::Log(QString("command %1").arg(command), 3);
+		NR::Log(QString("command %1").arg(command), 6);
 		switch (command) {
 		case 1:
 			sendText(socket, QString::number(++ii));

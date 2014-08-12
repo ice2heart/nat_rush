@@ -1,7 +1,6 @@
 #ifndef CORESERVER_H
 #define CORESERVER_H
 
-
 #include "../common/common.h"
 #include <QTcpServer>
 #include <QMap>
@@ -25,7 +24,6 @@ private:
 };
 
 typedef QSharedPointer<ConnectionStorage> sConStore;
-
 
 class CoreServer : public QObject
 {

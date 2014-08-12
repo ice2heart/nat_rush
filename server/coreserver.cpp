@@ -26,7 +26,7 @@ void CoreServer::newConnection()
 	sConStore client = mCoreClients[newClient];
 	client->mNextBlockSize = 0;
 	client->mSocket = newClient;
-	connect(client->mRawServer, SIGNAL(newData(quint8,QByteArray)), client.data(), SLOT(incomingRawData(quint8,QByteArray)));
+	connect(client->mRawServer, SIGNAL(newData(quint8,QByteArray)), client.data(), SLOT(incomingData(quint8,QByteArray)));
 	connect(client->mRawServer, SIGNAL(clientIn(quint8)), client.data(), SLOT(rawClientIn(quint8)));
 	connect(client->mRawServer, SIGNAL(clientOut(quint8)), client.data(), SLOT(rawClientOut(quint8)));
 }

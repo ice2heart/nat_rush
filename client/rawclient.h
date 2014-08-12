@@ -7,7 +7,7 @@ class RawClient : public QObject
 {
 	Q_OBJECT
 public:
-	explicit RawClient(quint8 id, QObject *parent = 0);
+	explicit RawClient(const QString &host, quint16 port, quint8 id, QObject *parent = 0);
 	virtual ~RawClient();
 signals:
 	void newData(quint8 id, const QByteArray &data);

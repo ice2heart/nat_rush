@@ -27,6 +27,8 @@ private:
 	QTcpSocket *mMainSocket;
 	quint64 mNextBlockSize;
 
+	QString mRawHost;
+	quint16 mRawPort;
 	QMap<quint8, RawClient*> mRawClients;
 };
 

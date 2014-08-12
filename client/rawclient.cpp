@@ -1,13 +1,13 @@
 #include "rawclient.h"
 
-RawClient::RawClient(quint8 id, QObject *parent) :
+RawClient::RawClient(const QString &host, quint16 port, quint8 id, QObject *parent) :
 	QObject(parent),
 	mId(id)
 {
 	mSocket = new QTcpSocket(this);
 	connect(mSocket, SIGNAL(connected()), this, SLOT(connected()));
 	connect(mSocket, SIGNAL(readyRead()), this, SLOT(readyRead()));
-	mSocket->connectToHost("127.0.0.1", 5900);
+	mSocket->connectToHost(host, port);
 }
 
 RawClient::~RawClient()

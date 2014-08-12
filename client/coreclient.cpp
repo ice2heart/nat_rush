@@ -3,15 +3,18 @@
 #include "../common/common.h"
 #include <QSettings>
 
-CoreClient::CoreClient(QObject *parent) :
-	QObject(parent)
+CoreClient::CoreClient(QObject *parent)
+	:QObject(parent)
+	,mNextBlockSize(0)
 {
 	QSettings setting("config.ini", QSettings::IniFormat);
 	QString address = setting.value("address", QString("178.62.189.199")).toString();
 	quint16 port = setting.value("port", 6900).toUInt();
-	setting.sync();
+	mRawHost = setting.value("rawAddress", QString("127.0.0.1")).toString();
+	mRawPort = setting.value("rawPort", 5900).toUInt();
+	quint8 logLvl = setting.value("logLevel", 0).toUInt();
+	NR::SetLogLvl(logLvl);
 	NR::Log(QString("Connect to %1:%2").arg(address).arg(port));
-	mNextBlockSize = 0;
 	mMainSocket = new QTcpSocket(this);
 	mMainSocket->connectToHost(address, port);
 	connect(mMainSocket, SIGNAL(connected()), this, SLOT(connected()));
@@ -21,7 +24,6 @@ CoreClient::CoreClient(QObject *parent) :
 
 void CoreClient::connected()
 {
-
 }
 
 void CoreClient::readyRead()
@@ -40,7 +42,7 @@ void CoreClient::readyRead()
 		if (mMainSocket->bytesAvailable() < mNextBlockSize)
 			break;
 
-		qDebug()<<"Block size"<<mNextBlockSize;
+		NR::Log(QString("Block size %1").arg(mNextBlockSize), 6);
 		QString text;
 		quint8 number;
 		quint8 clientId;
@@ -49,17 +51,17 @@ void CoreClient::readyRead()
 		switch (number) {
 		case 1:
 			in >> text;
-			qDebug()<<text;
+			NR::Log(QString("Ping data %1").arg(text), 6);
 			QTimer::singleShot(50000, this, SLOT(test()));
 			break;
 		case CLIENTIN:
 			in >> clientId;
-			qDebug()<<"Client in"<<clientId;
+			NR::Log(QString("Client in %1").arg(clientId), 3);
 			clientIn(clientId);
 			break;
 		case CLIENTOUT:
 			in >> clientId;
-			qDebug()<<"Client out"<<clientId;
+			NR::Log(QString("Client out %1").arg(clientId), 3);
 			clientOut(clientId);
 			break;
 		case RAWDATA:
@@ -67,7 +69,7 @@ void CoreClient::readyRead()
 			in >> tempBa;
 			if (mRawClients.contains(clientId))
 				mRawClients[clientId]->sendRawData(tempBa);
-			qDebug()<<"rawdata"<<tempBa.length();
+			NR::Log(QString("Incoming rawdata size %1").arg(tempBa.length()), 6);
 		default:
 			break;
 		}
@@ -100,7 +102,7 @@ void CoreClient::incomingData(quint8 id, const QByteArray &data)
 
 void CoreClient::clientIn(quint8 id)
 {
-	mRawClients.insert(id, new RawClient(id, this));
+	mRawClients.insert(id, new RawClient(mRawHost, mRawPort, id, this));
 	connect(mRawClients[id], SIGNAL(newData(quint8,QByteArray)), this, SLOT(incomingData(quint8,QByteArray)));
 }
 

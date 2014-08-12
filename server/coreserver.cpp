@@ -60,6 +60,7 @@ void CoreServer::readyRead()
 		NR::Log(QString("command %1").arg(command), 6);
 		switch (command) {
 		case 1:
+			in >> conNum;
 			sendText(socket, QString::number(++ii));
 			break;
 		case 99:

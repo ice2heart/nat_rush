@@ -1,5 +1,4 @@
 #include "coreclient.h"
-#include <QDebug>
 #include <QTimer>
 #include "../common/common.h"
 #include <QSettings>
@@ -7,8 +6,6 @@
 CoreClient::CoreClient(QObject *parent) :
 	QObject(parent)
 {
-	//mNextblock Надо вынести в мапку
-
 	QSettings setting("config.ini", QSettings::IniFormat);
 	QString address = setting.value("address", QString("178.62.189.199")).toString();
 	quint16 port = setting.value("port", 6900).toUInt();
@@ -24,8 +21,6 @@ CoreClient::CoreClient(QObject *parent) :
 
 void CoreClient::connected()
 {
-	/*mRawClient = new RawClient(this);
-	*/
 
 }
 
@@ -67,7 +62,7 @@ void CoreClient::readyRead()
 			qDebug()<<"Client out"<<clientId;
 			clientOut(clientId);
 			break;
-		case 99:
+		case RAWDATA:
 			in >> clientId;
 			in >> tempBa;
 			if (mRawClients.contains(clientId))
@@ -85,16 +80,7 @@ void CoreClient::test()
 	if (!mMainSocket)
 		return;
 
-	QByteArray dataBlock;
-	QDataStream out(&dataBlock, QIODevice::WriteOnly);
-	out.setVersion(QDataStream::Qt_4_6);
-	out << quint64(0) << quint8(1); //screen request
-
-	out.device()->seek(0);
-	out << quint64(dataBlock.size() - sizeof(quint64));
-
-	qDebug()<<"client: send byte" << dataBlock.size();
-	mMainSocket->write(dataBlock);
+	NR::writeToSocket(mMainSocket, 1, 0);
 }
 
 
@@ -106,13 +92,10 @@ void CoreClient::incomingData(quint8 id, const QByteArray &data)
 	QByteArray dataBlock;
 	QDataStream out(&dataBlock, QIODevice::WriteOnly);
 	out.setVersion(QDataStream::Qt_4_6);
-	out << quint64(0) << quint8(99)<<quint8(id); //поправить формат сереализации
-	out << data;
-	out.device()->seek(0);
-	out << quint64(dataBlock.size() - sizeof(quint64));
+	out << quint8(id) << data;
 
-	qDebug()<<"client: send byte" << dataBlock.size();
-	mMainSocket->write(dataBlock);
+	NR::Log(QString("Send raw bytes size %1").arg(dataBlock.size()), 6);
+	NR::writeToSocket(mMainSocket, RAWDATA, dataBlock);
 }
 
 void CoreClient::clientIn(quint8 id)

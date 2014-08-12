@@ -1,8 +1,6 @@
 #ifndef RAWCLIENT_H
 #define RAWCLIENT_H
 
-#include <QObject>
-#include <QTcpSocket>
 #include "../common/common.h"
 
 class RawClient : public QObject

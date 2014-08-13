@@ -41,6 +41,8 @@ private:
 	QTcpServer *mMainServer;
 	QMap<QTcpSocket*, sConStore> mCoreClients;
 	intPool mIntPool;
+	quint16 mMainPort;
+	quint8 mLogLvl;
 };
 
 #endif // CORESERVER_H

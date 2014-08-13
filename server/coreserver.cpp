@@ -1,18 +1,26 @@
 #include "coreserver.h"
+#include "QSettings"
 
 CoreServer::CoreServer(QObject *parent)
 	:QObject(parent)
 	,mIntPool()
 {
+	QSettings setting("config.ini", QSettings::IniFormat);
+	mMainPort = setting.value("MainPort", 6900).toUInt();
+	setting.setValue("MainPort", mMainPort);
+	mLogLvl = setting.value("LogLevel", 3).toUInt();
+	setting.setValue("LogLevel", mLogLvl);
+	setting.sync();
+
 	mMainServer = new QTcpServer(this);
 	for (quint8 i = 0; i<50; i++)
 		mIntPool.addItem(i);
 	connect(mMainServer, SIGNAL(newConnection()), this, SLOT(newConnection()));
-	if (!mMainServer->listen(QHostAddress::Any,6900))
+	if (!mMainServer->listen(QHostAddress::Any,mMainPort))
 	{
-		qWarning()<<"Server start failure";
+		NR::Log("Server start failure");
 	}
-	NR::SetLogLvl(3);
+	NR::SetLogLvl(mLogLvl);
 	NR::Log("Ready!");
 }
 

@@ -36,6 +36,7 @@ public slots:
 	void readyRead();
 	void disconnected();
 	void sendText(QTcpSocket *socket, const QString &text);
+	void sendError(QTcpSocket *socket, const QString &reason);
 private:
 	QTcpServer *mMainServer;
 	QMap<QTcpSocket*, sConStore> mCoreClients;

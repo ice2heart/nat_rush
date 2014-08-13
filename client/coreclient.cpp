@@ -24,6 +24,8 @@ CoreClient::CoreClient(QObject *parent)
 
 void CoreClient::connected()
 {
+	sendVersion();
+	test();
 }
 
 void CoreClient::readyRead()
@@ -49,7 +51,7 @@ void CoreClient::readyRead()
 		in >> number;
 		QByteArray tempBa;
 		switch (number) {
-		case 1:
+		case TEXTDATA:
 			in >> text;
 			NR::Log(QString("Ping data %1").arg(text), 6);
 			QTimer::singleShot(50000, this, SLOT(test()));
@@ -82,7 +84,12 @@ void CoreClient::test()
 	if (!mMainSocket)
 		return;
 
-	NR::writeToSocket(mMainSocket, 1, 0);
+	NR::writeToSocket(mMainSocket, TEXTDATA, 0);
+}
+
+void CoreClient::sendVersion()
+{
+	NR::writeToSocket(mMainSocket, PROTODATA, gCurrentVersion);
 }
 
 

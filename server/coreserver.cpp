@@ -56,14 +56,23 @@ void CoreServer::readyRead()
 		in >> command;
 		static int ii = 0;
 		quint8 conNum;
+		quint8 version;
 		QByteArray tempBa;
 		NR::Log(QString("command %1").arg(command), 6);
 		switch (command) {
-		case 1:
+		case TEXTDATA:
 			in >> conNum;
 			sendText(socket, QString::number(++ii));
 			break;
-		case 99:
+		case PROTODATA:
+			in >> version;
+			if (version != gCurrentVersion)
+			{
+				sendError(socket, "Bad version");
+				socket->close();
+			}
+			break;
+		case RAWDATA:
 			in >> conNum;
 			in >> tempBa;
 			NR::Log(QString("New raw data length %1").arg(tempBa.length()), 6);
@@ -86,6 +95,12 @@ void CoreServer::disconnected()
 void CoreServer::sendText(QTcpSocket *socket, const QString &text)
 {
 	NR::writeToSocket(socket, TEXTDATA, text);
+}
+
+void CoreServer::sendError(QTcpSocket *socket, const QString &reason)
+{
+	NR::Log(QString("ERROR: Send error msg reason: %1").arg(reason));
+	NR::writeToSocket(socket, ERRORMSG, reason);
 }
 
 ConnectionStorage::ConnectionStorage(intPool::spItem portShift, QObject *parent)

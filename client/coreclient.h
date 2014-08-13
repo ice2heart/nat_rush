@@ -19,6 +19,7 @@ public slots:
 	void connected();
 	void readyRead();
 	void test();
+	void sendVersion();
 	void incomingData(quint8 id, const QByteArray &data);
 	void clientIn(quint8 id);
 	void clientOut(quint8 id);

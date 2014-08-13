@@ -13,6 +13,11 @@ const static quint8 CLIENTIN = 3;
 const static quint8 CLIENTOUT = 4;
 const static quint8 TEXTDATA = 1;
 const static quint8 RAWDATA = 99;
+const static quint8 PROTODATA = 5;
+const static quint8 ERRORMSG = 6;
+
+const static quint8 gCurrentVersion = 1;
+
 namespace NR {
 
 void writeToSocket(QTcpSocket *client, quint8 type, const QByteArray &qba);

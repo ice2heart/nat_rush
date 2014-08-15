@@ -1,17 +1,17 @@
 #ifndef CORECLIENT_H
 #define CORECLIENT_H
 
-#include <QObject>
-#include <QTcpSocket>
-#include <QDataStream>
+#include "../common/common.h"
 #include <QMap>
 #include "rawclient.h"
+#include "QProcess"
 
 class CoreClient : public QObject
 {
 	Q_OBJECT
 public:
 	explicit CoreClient(QObject *parent = 0);
+	virtual ~CoreClient();
 
 signals:
 
@@ -24,6 +24,7 @@ public slots:
 	void clientIn(quint8 id);
 	void clientOut(quint8 id);
 	void disconnected();
+	void HandleStateChange(QAbstractSocket::SocketState socketState);
 private:
 	QTcpSocket *mMainSocket;
 	quint64 mNextBlockSize;
@@ -31,6 +32,8 @@ private:
 	QString mRawHost;
 	quint16 mRawPort;
 	QMap<quint8, RawClient*> mRawClients;
+	QString mProcessName;
+	QProcess vncProcess;
 };
 
 #endif // CORECLIENT_H

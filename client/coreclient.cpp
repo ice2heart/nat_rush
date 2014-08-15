@@ -1,6 +1,6 @@
 #include "coreclient.h"
 #include <QTimer>
-#include "../common/common.h"
+#include <QStringList>
 #include <QSettings>
 
 CoreClient::CoreClient(QObject *parent)
@@ -13,6 +13,14 @@ CoreClient::CoreClient(QObject *parent)
 	mRawHost = setting.value("rawAddress", QString("127.0.0.1")).toString();
 	mRawPort = setting.value("rawPort", 5900).toUInt();
 	quint8 logLvl = setting.value("logLevel", 0).toUInt();
+	mProcessName = setting.value("process","winvnc.exe").toString();
+	if (mProcessName != "none")
+	{
+		QStringList arg;
+		arg << "-run";
+		vncProcess.start(mProcessName, arg);
+		vncProcess.waitForStarted();
+	}
 	NR::SetLogLvl(logLvl);
 	NR::Log(QString("Connect to %1:%2").arg(address).arg(port));
 	mMainSocket = new QTcpSocket(this);
@@ -20,6 +28,10 @@ CoreClient::CoreClient(QObject *parent)
 	connect(mMainSocket, SIGNAL(connected()), this, SLOT(connected()));
 	connect(mMainSocket, SIGNAL(readyRead()), this, SLOT(readyRead()));
 	connect(mMainSocket, SIGNAL(disconnected()), this, SLOT(disconnected()));
+}
+
+CoreClient::~CoreClient()
+{
 }
 
 void CoreClient::connected()
@@ -123,4 +135,8 @@ void CoreClient::clientOut(quint8 id)
 void CoreClient::disconnected()
 {
 	exit(0);
+}
+
+void CoreClient::HandleStateChange(QAbstractSocket::SocketState socketState)
+{
 }

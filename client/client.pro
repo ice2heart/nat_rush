@@ -4,12 +4,9 @@
 #
 #-------------------------------------------------
 
-QT       += core network
-
-QT       -= gui
+QT       += gui network widgets
 
 TARGET = client
-CONFIG   += console
 CONFIG   -= app_bundle
 
 TEMPLATE = app
@@ -19,9 +16,11 @@ TEMPLATE = app
 SOURCES += main.cpp \
     coreclient.cpp \
     rawclient.cpp \
-    ../common/common.cpp
+    ../common/common.cpp \
+    clientmainwindow.cpp
 
 HEADERS += \
     coreclient.h \
     rawclient.h \
-    ../common/common.h
+    ../common/common.h \
+    clientmainwindow.h

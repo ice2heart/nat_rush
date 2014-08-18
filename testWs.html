@@ -22,7 +22,7 @@ function ConnectionListViewModel() {
       self.updateList($.parseJSON(evt.data));
     };
     self.websocket.onopen = function(evt) {
-      alert('Connect!');
+      self.websocket.send('need data');
     };
 
     self.updateList = function(allData) {
@@ -41,11 +41,15 @@ ko.applyBindings(new ConnectionListViewModel());
 </script>
 </head>
 <body>
-<div>
-<h3>List</h3>
-<div data-bind='foreach: connections'>
+<div data-bind='visible: connections().length > 0'>
+	<h3 >List</h3>
+	<div data-bind='foreach: connections'>
 		<h data-bind='text: connStr '></h>
+	</div>
 </div>
+<div data-bind='visible: connections().length == 0'>
+	<h3 >No users</h3>
+	
 </div>
 </body>
 </html>

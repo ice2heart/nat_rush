@@ -70,13 +70,14 @@ void WSOutput::newConection()
 	connect(clientSocket, static_cast<void (QtWebsocket::QWsSocket::*)(QString)>(&QtWebsocket::QWsSocket::frameReceived),
 			this, &WSOutput::readClient);
 	clients.insert(clientSocket, ++mIncr);
+	emit getList();
 }
 
 void WSOutput::readClient(QString frame)
 {
 	QtWebsocket::QWsSocket* socket = qobject_cast<QtWebsocket::QWsSocket*>(sender());
 	emit getList();
-	sendToRawClient(socket, tr("ok"));
+	//sendToRawClient(socket, tr("ok"));
 
 }
 

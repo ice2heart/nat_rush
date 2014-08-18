@@ -7,6 +7,10 @@
 function PItem(data) {
 	this.connIp = ko.observable(data['ip']);
     this.connPort = ko.observable(data['port']);
+    this.connId = ko.observable(data['id']);
+    this.connStr = ko.computed(function() {
+        return  'Id '+this.connId() +'  '+ this.connIp() +'<br>'+'178.62.189.199:' + this.connPort();
+    }, this);
 }
 function ConnectionListViewModel() {
     // Data
@@ -15,16 +19,14 @@ function ConnectionListViewModel() {
  	wsUri = 'ws://178.62.189.199:8080/';
 	self.websocket = new WebSocket(wsUri);
     self.websocket.onmessage = function(evt) {
-   	  var jobj = $.parseJSON(evt.data);
-   	  alert(jobj['id']);
-      self.updateList(jobj);
+      self.updateList($.parseJSON(evt.data));
     };
     self.websocket.onopen = function(evt) {
       alert('Connect!');
     };
 
     self.updateList = function(allData) {
-            var mappedPl = $.map(allData['id'], function(item) { return new PItem(item)});
+            var mappedPl = $.map(allData['data'], function(item) { return new PItem(item)});
             self.connections(mappedPl);
     }
     
@@ -41,13 +43,9 @@ ko.applyBindings(new ConnectionListViewModel());
 <body>
 <div>
 <h3>List</h3>
-<ul data-bind='foreach: connections'>
-	<li>
-		<h3>^_^</h3>
-		<a href='#' data-bind='text: connIp'></a>
-		<a href='#' data-bind='text: connPort'></a>
-	</li>
-</ul>
+<div data-bind='foreach: connections'>
+		<h data-bind='text: connStr '></h>
+</div>
 </div>
 </body>
 </html>

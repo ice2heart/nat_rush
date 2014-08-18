@@ -37,6 +37,7 @@ void CoreServer::newConnection()
 	connect(client->mRawServer, SIGNAL(newData(quint8,QByteArray)), client.data(), SLOT(incomingData(quint8,QByteArray)));
 	connect(client->mRawServer, SIGNAL(clientIn(quint8)), client.data(), SLOT(rawClientIn(quint8)));
 	connect(client->mRawServer, SIGNAL(clientOut(quint8)), client.data(), SLOT(rawClientOut(quint8)));
+	genListConnection();
 }
 
 void CoreServer::readyRead()
@@ -98,6 +99,7 @@ void CoreServer::disconnected()
 	NR::Log("Client gone");
 	QTcpSocket *socket = (QTcpSocket *) sender();
 	mCoreClients.remove(socket);
+	genListConnection();
 }
 
 void CoreServer::sendText(QTcpSocket *socket, const QString &text)
@@ -111,11 +113,25 @@ void CoreServer::sendError(QTcpSocket *socket, const QString &reason)
 	NR::writeToSocket(socket, ERRORMSG, reason);
 }
 
+void CoreServer::genListConnection()
+{
+	QVector<connData> vect;
+
+	foreach (sConStore conStore, mCoreClients) {
+		connData conn;
+		conn.ip = conStore->mSocket->peerAddress().toString();
+		conn.port = *(conStore->mPortShift) + BASEPORT;
+		conn.id = *(conStore->mPortShift);
+		vect.append(conn);
+	}
+	emit listConnection(vect);
+}
+
 ConnectionStorage::ConnectionStorage(intPool::spItem portShift, QObject *parent)
 	:QObject(parent)
 	,mPortShift(portShift)
 {
-	mRawServer = new RawServer((*mPortShift)+8000, this);
+	mRawServer = new RawServer((*mPortShift)+BASEPORT, this);
 }
 
 ConnectionStorage::~ConnectionStorage()

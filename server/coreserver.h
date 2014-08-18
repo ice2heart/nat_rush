@@ -19,7 +19,7 @@ public slots:
 	void rawClientIn(quint8 id);
 	void rawClientOut(quint8 id);
 	void incomingData(quint8 clientId, const QByteArray &data);
-private:
+public:
 	intPool::spItem mPortShift;
 };
 
@@ -31,12 +31,14 @@ class CoreServer : public QObject
 public:
 	explicit CoreServer(QObject *parent = 0);
 signals:
+	void listConnection(const QVector<connData> &data);
 public slots:
 	void newConnection();
 	void readyRead();
 	void disconnected();
 	void sendText(QTcpSocket *socket, const QString &text);
 	void sendError(QTcpSocket *socket, const QString &reason);
+	void genListConnection();
 private:
 	QTcpServer *mMainServer;
 	QMap<QTcpSocket*, sConStore> mCoreClients;

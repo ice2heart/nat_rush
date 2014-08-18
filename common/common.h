@@ -8,6 +8,7 @@
 #include <QMap>
 
 const static quint32 BUFSIZE = 5000;
+const static quint16 BASEPORT = 8000;
 const static quint8 SERVERSTART = 2;
 const static quint8 CLIENTIN = 3;
 const static quint8 CLIENTOUT = 4;
@@ -16,7 +17,13 @@ const static quint8 RAWDATA = 99;
 const static quint8 PROTODATA = 5;
 const static quint8 ERRORMSG = 6;
 
-const static quint8 gCurrentVersion = 1;
+const static quint8 gCurrentVersion = 2;
+struct connData
+{
+	quint8 id;
+	QString ip;
+	quint16 port;
+};
 
 namespace NR {
 

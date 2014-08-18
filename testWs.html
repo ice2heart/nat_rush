@@ -12,29 +12,28 @@ function ConnectionListViewModel() {
     // Data
     var self = this;
     self.connections = ko.observableArray([]);
+ 	wsUri = 'ws://178.62.189.199:8080/';
+	self.websocket = new WebSocket(wsUri);
+ 	self.WS = websocket;
+    self.websocket.onmessage = function(evt) {
+      self.updateList(evt.data);
+    };
+    self.websocket.onopen = function(evt) {
+      alert('Connect!');
+    };
+
     self.updateList = function(allData) {
             var mappedPl = $.map(allData['id'], function(item) { return new PItem(item)});
             self.connections(mappedPl);
     }
     
 }
-function init() {
-	wsUri = 'ws://localhost:8080/';
-	websocket = new WebSocket(wsUri);
-    window.WS = websocket;
-    websocket.onmessage = function(evt) {
-      ConnectionListViewModel.updateList(evt.data);
-    };
-    websocket.onopen = function(evt) {
-      alert('Connect!');
-    };
-}
+
 //Вот этот кусок кода нужен для правильного старта нокаута
 $( document ).ready( function() {
 
 ko.applyBindings(new ConnectionListViewModel());
-init();
-window.WS.open();
+
 });
 </script>
 </head>
@@ -43,6 +42,7 @@ window.WS.open();
 <h3>List</h3>
 <ul data-bind='foreach: connections'>
 	<li>
+		<h3>^_^</h3>
 		<a href='#' data-bind='text: connIp'></a>
 		<a href='#' data-bind='text: connPort'></a>
 	</li>

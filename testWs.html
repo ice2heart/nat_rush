@@ -1,0 +1,41 @@
+<html>
+<head>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/knockout/3.1.0/knockout-min.js"></script>
+<script>
+
+function PItem(data) {
+	this.connIp = ko.observable(data['ip']);
+    this.connPort = ko.observable(data['port']);
+}
+function ConnectionListViewModel() {
+    // Data
+    var self = this;
+    self.connections = ko.observableArray([]);
+    self.updateList = function(allData) {
+            var mappedPl = $.map(allData['id'], function(item) { return new PItem(item)};
+            self.connections(mappedPl);
+    }
+    
+}
+function init() {
+	wsUri = 'ws://localhost:8080/';
+	websocket = new WebSocket(wsUri);
+    window.WS = websocket;
+    websocket.onmessage = function(evt) {
+      ConnectionListViewModel.updateList(evt.data);
+    };
+}
+//Вот этот кусок кода нужен для правильного старта нокаута
+$( document ).ready( function() {
+
+ko.applyBindings(new ConnectionListViewModel());
+init();
+window.WS.open();
+});
+</script>
+</head>
+<body>
+
+</body>
+</html>

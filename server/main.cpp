@@ -4,8 +4,8 @@
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
-    CoreServer server;
+	QCoreApplication a(argc, argv);
+	CoreServer server;
 	WSOutput output;
-    return a.exec();
+	return a.exec();
 }

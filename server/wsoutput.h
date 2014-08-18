@@ -1,7 +1,6 @@
 #ifndef WSOUTPUT_H
 #define WSOUTPUT_H
 
-#include <QObject>
 #include <QString>
 #include "QWsServer.h"
 #include "QWsSocket.h"
@@ -27,6 +26,8 @@ private slots:
 private:
 	QtWebsocket::QWsServer* server;
 	QMap<QtWebsocket::QWsSocket*, int> clients;
-	int mIncr; //FIX ME};
+	int mIncr;
+//FIX ME
+};
 
 #endif // WSOUTPUT_H

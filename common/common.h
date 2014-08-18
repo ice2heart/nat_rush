@@ -8,7 +8,7 @@
 #include <QMap>
 
 const static quint32 BUFSIZE = 5000;
-const static quint16 BASEPORT = 8000;
+const static quint16 BASEPORT = 7000;
 const static quint8 SERVERSTART = 2;
 const static quint8 CLIENTIN = 3;
 const static quint8 CLIENTOUT = 4;

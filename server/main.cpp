@@ -6,7 +6,7 @@ int main(int argc, char *argv[])
 {
 	QCoreApplication a(argc, argv);
 	CoreServer server;
-	WSOutput output;
+	WSOutput output(8080);
 	QObject::connect(&server, &CoreServer::listConnection, &output, &WSOutput::listConnection);
 	QObject::connect(&output, &WSOutput::getList, &server, &CoreServer::genListConnection);
 	return a.exec();

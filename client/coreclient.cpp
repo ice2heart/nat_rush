@@ -32,6 +32,7 @@ CoreClient::CoreClient(QObject *parent)
 
 CoreClient::~CoreClient()
 {
+	vncProcess.close();
 }
 
 void CoreClient::connected()

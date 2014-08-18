@@ -13,7 +13,7 @@ function ConnectionListViewModel() {
     var self = this;
     self.connections = ko.observableArray([]);
     self.updateList = function(allData) {
-            var mappedPl = $.map(allData['id'], function(item) { return new PItem(item)};
+            var mappedPl = $.map(allData['id'], function(item) { return new PItem(item)});
             self.connections(mappedPl);
     }
     
@@ -24,6 +24,9 @@ function init() {
     window.WS = websocket;
     websocket.onmessage = function(evt) {
       ConnectionListViewModel.updateList(evt.data);
+    };
+    websocket.onopen = function(evt) {
+      alert('Connect!');
     };
 }
 //Вот этот кусок кода нужен для правильного старта нокаута
@@ -36,6 +39,14 @@ window.WS.open();
 </script>
 </head>
 <body>
-
+<div>
+<h3>List</h3>
+<ul data-bind='foreach: connections'>
+	<li>
+		<a href='#' data-bind='text: connIp'></a>
+		<a href='#' data-bind='text: connPort'></a>
+	</li>
+</ul>
+</div>
 </body>
 </html>

@@ -1,6 +1,7 @@
 #include "wsoutput.h"
 #include <QJsonObject>
 #include <QJsonDocument>
+#include <QJsonArray>
 
 WSOutput::WSOutput(int port, QtWebsocket::Protocol protocol, QObject *parent)
 	:QObject(parent)
@@ -22,15 +23,18 @@ WSOutput::WSOutput(int port, QtWebsocket::Protocol protocol, QObject *parent)
 void WSOutput::listConnection(const QVector<connData> &data)
 {
 	QJsonObject mainObj;
+	QJsonArray mainArr;
 	foreach (connData conn, data) {
 		QJsonObject connObj;
 		connObj.insert("ip", conn.ip);
 		connObj.insert("port", conn.port);
-		mainObj.insert("id", conn.id);
+		connObj.insert("id", conn.id);
+		mainArr.append(connObj);
 	}
+	mainObj.insert("data",mainArr);
 	QJsonDocument doc(mainObj);
 	QString output(doc.toJson());
-	qDebug()<<output;
+	NR::Log(output, 3);
 	sendAll(output);
 }
 

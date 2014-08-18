@@ -14,9 +14,10 @@ function ConnectionListViewModel() {
     self.connections = ko.observableArray([]);
  	wsUri = 'ws://178.62.189.199:8080/';
 	self.websocket = new WebSocket(wsUri);
- 	self.WS = websocket;
     self.websocket.onmessage = function(evt) {
-      self.updateList(evt.data);
+   	  var jobj = $.parseJSON(evt.data);
+   	  alert(jobj['id']);
+      self.updateList(jobj);
     };
     self.websocket.onopen = function(evt) {
       alert('Connect!');

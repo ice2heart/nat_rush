@@ -16,6 +16,7 @@ signals:
 	void newData(quint8 clientId, const QByteArray &data);
 	void clientIn(quint8 clientId);
 	void clientOut(quint8 clientId);
+	void serverStart(quint16 port);
 public slots:
 	void newConnection();
 

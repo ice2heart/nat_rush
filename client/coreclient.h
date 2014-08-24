@@ -14,7 +14,7 @@ public:
 	virtual ~CoreClient();
 
 signals:
-
+	void connectionInfo(quint8 type, const QString &text);
 public slots:
 	void connected();
 	void readyRead();

@@ -16,8 +16,11 @@ const static quint8 TEXTDATA = 1;
 const static quint8 RAWDATA = 99;
 const static quint8 PROTODATA = 5;
 const static quint8 ERRORMSG = 6;
+const static quint8 RAWSERVERSTART = 7;
 
-const static quint8 gCurrentVersion = 2;
+const static quint8 CLIENT_SERVER_OK = 1;
+
+const static quint8 gCurrentVersion = 3;
 struct connData
 {
 	quint8 id;
@@ -29,6 +32,7 @@ namespace NR {
 
 void writeToSocket(QTcpSocket *client, quint8 type, const QByteArray &qba);
 void writeToSocket(QTcpSocket *client, quint8 type, quint8 data);
+void writeToSocket(QTcpSocket *client, quint8 type, quint16 data);
 void writeToSocket(QTcpSocket *client, quint8 type, const QString &str);
 
 void Log(const QString &msg, quint8 logLvl = 0);

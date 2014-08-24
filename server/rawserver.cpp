@@ -13,6 +13,7 @@ RawServer::RawServer(quint32 port, QObject *parent)
 	}
 	NR::Log(QString("Raw server start %1").arg(mPort), 0);
 	connect(mServer, SIGNAL(newConnection()), this, SLOT(newConnection()));
+	emit serverStart(port);
 }
 
 RawServer::~RawServer()

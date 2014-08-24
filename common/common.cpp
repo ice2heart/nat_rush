@@ -25,6 +25,15 @@ void writeToSocket(QTcpSocket *client, quint8 type, quint8 data)
 	writeToSocket(client, type, dataBlock);
 }
 
+void writeToSocket(QTcpSocket *client, quint8 type, quint16 data)
+{
+	QByteArray dataBlock;
+	QDataStream out(&dataBlock, QIODevice::WriteOnly);
+	out.setVersion(QDataStream::Qt_4_6);
+	out << quint16(data);
+	writeToSocket(client, type, dataBlock);
+}
+
 void writeToSocket(QTcpSocket *client, quint8 type, const QString &str)
 {
 	QByteArray dataBlock;
@@ -43,7 +52,5 @@ void Log(const QString &msg, quint8 logLvl)
 	if (logLvl <= gLogLvl)
 		qDebug()<<msg;
 }
-
-
 }
 

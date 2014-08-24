@@ -28,6 +28,7 @@ CoreClient::CoreClient(QObject *parent)
 	connect(mMainSocket, SIGNAL(connected()), this, SLOT(connected()));
 	connect(mMainSocket, SIGNAL(readyRead()), this, SLOT(readyRead()));
 	connect(mMainSocket, SIGNAL(disconnected()), this, SLOT(disconnected()));
+	connect(mMainSocket, SIGNAL(stateChanged(QAbstractSocket::SocketState)), this, SLOT(HandleStateChange(QAbstractSocket::SocketState)));
 }
 
 CoreClient::~CoreClient()
@@ -61,6 +62,7 @@ void CoreClient::readyRead()
 		QString text;
 		quint8 number;
 		quint8 clientId;
+		quint16 serverPort;
 		in >> number;
 		QByteArray tempBa;
 		switch (number) {
@@ -78,6 +80,11 @@ void CoreClient::readyRead()
 			in >> clientId;
 			NR::Log(QString("Client out %1").arg(clientId), 3);
 			clientOut(clientId);
+			break;
+		case RAWSERVERSTART:
+			in >> serverPort;
+			emit connectionInfo(CLIENT_SERVER_OK, tr("Вы клиент номер %1").arg(serverPort));
+			NR::Log(QString("Server start in port %1").arg(serverPort), 3);
 			break;
 		case RAWDATA:
 			in >> clientId;
@@ -140,4 +147,5 @@ void CoreClient::disconnected()
 
 void CoreClient::HandleStateChange(QAbstractSocket::SocketState socketState)
 {
+	NR::Log(QString::number(socketState), 0);
 }

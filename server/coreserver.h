@@ -19,6 +19,7 @@ public slots:
 	void rawClientIn(quint8 id);
 	void rawClientOut(quint8 id);
 	void incomingData(quint8 clientId, const QByteArray &data);
+	void rawServerStarted(quint16 port);
 public:
 	intPool::spItem mPortShift;
 };

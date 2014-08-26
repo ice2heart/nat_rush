@@ -16,6 +16,7 @@ public:
 signals:
 	void connectionInfo(quint8 type, const QString &text);
 public slots:
+	void tryConnect();
 	void connected();
 	void readyRead();
 	void test();
@@ -24,10 +25,12 @@ public slots:
 	void clientIn(quint8 id);
 	void clientOut(quint8 id);
 	void disconnected();
-	void HandleStateChange(QAbstractSocket::SocketState socketState);
+	void error(QAbstractSocket::SocketError socketState);
 private:
 	QTcpSocket *mMainSocket;
 	quint64 mNextBlockSize;
+	QString mHostName;
+	quint16 mHostPort;
 
 	QString mRawHost;
 	quint16 mRawPort;

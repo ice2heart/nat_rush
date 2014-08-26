@@ -165,5 +165,5 @@ void ConnectionStorage::incomingData(quint8 clientId, const QByteArray &data)
 void ConnectionStorage::rawServerStarted(quint16 port)
 {
 	NR::Log(QString("Send info about port %1").arg(port), 3);
-	NR::writeToSocket(mSocket,RAWSERVERSTART, port);
+	NR::writeToSocket(mSocket,RAWSERVERSTART, quint16(port));
 }

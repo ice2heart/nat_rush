@@ -9,8 +9,8 @@ CoreClient::CoreClient(QObject *parent)
 	,mNextBlockSize(0)
 {
 	QSettings setting("config.ini", QSettings::IniFormat);
-	QString address = setting.value("address", QString("178.62.189.199")).toString();
-	quint16 port = setting.value("port", 6900).toUInt();
+	mHostName = setting.value("address", QString("178.62.189.199")).toString();
+	mHostPort = setting.value("port", 6900).toUInt();
 	mRawHost = setting.value("rawAddress", QString("127.0.0.1")).toString();
 	mRawPort = setting.value("rawPort", 5900).toUInt();
 	quint8 logLvl = setting.value("logLevel", 0).toUInt();
@@ -23,13 +23,18 @@ CoreClient::CoreClient(QObject *parent)
 		vncProcess.waitForStarted();
 	}
 	NR::SetLogLvl(logLvl);
-	NR::Log(QString("Connect to %1:%2").arg(address).arg(port));
 	mMainSocket = new QTcpSocket(this);
-	mMainSocket->connectToHost(address, port);
 	connect(mMainSocket, SIGNAL(connected()), this, SLOT(connected()));
 	connect(mMainSocket, SIGNAL(readyRead()), this, SLOT(readyRead()));
 	connect(mMainSocket, SIGNAL(disconnected()), this, SLOT(disconnected()));
-	connect(mMainSocket, SIGNAL(stateChanged(QAbstractSocket::SocketState)), this, SLOT(HandleStateChange(QAbstractSocket::SocketState)));
+	connect(mMainSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(error(QAbstractSocket::SocketError)));
+}
+
+void CoreClient::tryConnect()
+{
+	NR::Log(QString("Connect to %1:%2").arg(mHostName).arg(mHostPort));
+	emit connectionInfo(CLIENT_SERVER_OK, tr("Подключение..."));
+	mMainSocket->connectToHost(mHostName, mHostPort);
 }
 
 CoreClient::~CoreClient()
@@ -143,10 +148,37 @@ void CoreClient::clientOut(quint8 id)
 
 void CoreClient::disconnected()
 {
-	qApp->exit();
+	//qApp->exit();
+	mMainSocket->abort();
+	mMainSocket->close();
 }
 
-void CoreClient::HandleStateChange(QAbstractSocket::SocketState socketState)
+void CoreClient::error(QAbstractSocket::SocketError socketState)
 {
-	NR::Log(QString::number(socketState), 0);
+	switch (socketState)
+	{
+	case QAbstractSocket::AddressInUseError:
+		NR::Log("SOCKET ERROR: Address is already in use");
+		emit connectionInfo(CLIENT_SERVER_ERROR, tr("Ошибка повторного использования аддреса.\nПерподключение через 5 сек."));
+		break;
+	case QAbstractSocket::ConnectionRefusedError:
+		NR::Log("SOCKET ERROR: Connection refused");
+		emit connectionInfo(CLIENT_SERVER_ERROR, tr("Сервер неотвечает, проблема с подключением.\nПерподключение через 5 сек."));
+		break;
+	case QAbstractSocket::HostNotFoundError:
+		NR::Log("SOCKET ERROR: Host not found");
+		emit connectionInfo(CLIENT_SERVER_ERROR, tr("Сетевая ошибка, не найден сервер.\nПерподключение через 5 сек."));
+		break;
+	case QAbstractSocket::RemoteHostClosedError:
+		NR::Log("SOCKET ERROR: Remote host closed");
+		emit connectionInfo(CLIENT_SERVER_ERROR, tr("Сервер разорвал соединение.\nПерподключение через 5 сек."));
+		break;
+	default:
+		NR::Log("SOCKET ERROR:unknown error");
+		emit connectionInfo(CLIENT_SERVER_ERROR, tr("Ошибка соединения.\nПерподключение через 5 сек."));
+		break;
+	}
+	mMainSocket->abort();
+	mMainSocket->close();
+	QTimer::singleShot(5000, this, SLOT(tryConnect()));
 }

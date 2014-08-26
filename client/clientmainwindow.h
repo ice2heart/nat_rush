@@ -13,6 +13,7 @@ public:
 signals:
 	
 public slots:
+	void info(quint8 type, const QString &data);
 private:
 	QPushButton stopPB;
 };

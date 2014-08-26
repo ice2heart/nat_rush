@@ -19,6 +19,7 @@ const static quint8 ERRORMSG = 6;
 const static quint8 RAWSERVERSTART = 7;
 
 const static quint8 CLIENT_SERVER_OK = 1;
+const static quint8 CLIENT_SERVER_ERROR = 2;
 
 const static quint8 gCurrentVersion = 3;
 struct connData

@@ -34,9 +34,6 @@ void CoreServer::newConnection()
 	sConStore client = mCoreClients[newClient];
 	client->mNextBlockSize = 0;
 	client->mSocket = newClient;
-	connect(client->mRawServer, SIGNAL(newData(quint8,QByteArray)), client.data(), SLOT(incomingData(quint8,QByteArray)));
-	connect(client->mRawServer, SIGNAL(clientIn(quint8)), client.data(), SLOT(rawClientIn(quint8)));
-	connect(client->mRawServer, SIGNAL(clientOut(quint8)), client.data(), SLOT(rawClientOut(quint8)));
 	genListConnection();
 }
 
@@ -133,6 +130,10 @@ ConnectionStorage::ConnectionStorage(intPool::spItem portShift, QObject *parent)
 {
 	mRawServer = new RawServer((*mPortShift)+BASEPORT, this);
 	connect(mRawServer, SIGNAL(serverStart(quint16)), this, SLOT(rawServerStarted(quint16)));
+	connect(mRawServer, SIGNAL(newData(quint8,QByteArray)), this, SLOT(incomingData(quint8,QByteArray)));
+	connect(mRawServer, SIGNAL(clientIn(quint8)), this, SLOT(rawClientIn(quint8)));
+	connect(mRawServer, SIGNAL(clientOut(quint8)), this, SLOT(rawClientOut(quint8)));
+
 
 }
 

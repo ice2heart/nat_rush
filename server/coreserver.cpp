@@ -131,8 +131,8 @@ ConnectionStorage::ConnectionStorage(intPool::spItem portShift, QObject *parent)
 	:QObject(parent)
 	,mPortShift(portShift)
 {
-	connect(mRawServer, SIGNAL(serverStart(quint16)), this, SLOT(rawServerStarted(quint16)));
 	mRawServer = new RawServer((*mPortShift)+BASEPORT, this);
+	connect(mRawServer, SIGNAL(serverStart(quint16)), this, SLOT(rawServerStarted(quint16)));
 
 }
 

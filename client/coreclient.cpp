@@ -2,6 +2,7 @@
 #include <QTimer>
 #include <QStringList>
 #include <QSettings>
+#include <QApplication>
 
 CoreClient::CoreClient(QObject *parent)
 	:QObject(parent)
@@ -104,7 +105,7 @@ void CoreClient::test()
 	if (!mMainSocket)
 		return;
 
-	NR::writeToSocket(mMainSocket, TEXTDATA, 0);
+	NR::writeToSocket(mMainSocket, TEXTDATA, quint8(0));
 }
 
 void CoreClient::sendVersion()
@@ -142,7 +143,7 @@ void CoreClient::clientOut(quint8 id)
 
 void CoreClient::disconnected()
 {
-	exit(0);
+	qApp->exit();
 }
 
 void CoreClient::HandleStateChange(QAbstractSocket::SocketState socketState)

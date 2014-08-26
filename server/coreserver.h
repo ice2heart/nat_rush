@@ -10,7 +10,7 @@ class ConnectionStorage : public QObject
 {
 	Q_OBJECT
 public:
-	ConnectionStorage(intPool::spItem portShift, QObject *parent = 0);
+	ConnectionStorage(intPool::spItem portShift, QTcpSocket *socket, QObject *parent = 0);
 	~ConnectionStorage();
 	quint64 mNextBlockSize;
 	RawServer *mRawServer;

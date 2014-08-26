@@ -28,12 +28,11 @@ void CoreServer::newConnection()
 {
 	QTcpSocket *newClient = mMainServer->nextPendingConnection();
 
-	mCoreClients.insert(newClient, sConStore(new ConnectionStorage(mIntPool.acquire())));
+	mCoreClients.insert(newClient, sConStore(new ConnectionStorage(mIntPool.acquire(), newClient)));
 	connect(newClient, SIGNAL(disconnected()), this, SLOT(disconnected()));
 	connect(newClient, SIGNAL(readyRead()), this, SLOT(readyRead()));
 	sConStore client = mCoreClients[newClient];
 	client->mNextBlockSize = 0;
-	client->mSocket = newClient;
 	genListConnection();
 }
 
@@ -124,9 +123,10 @@ void CoreServer::genListConnection()
 	emit listConnection(vect);
 }
 
-ConnectionStorage::ConnectionStorage(intPool::spItem portShift, QObject *parent)
+ConnectionStorage::ConnectionStorage(intPool::spItem portShift, QTcpSocket *socket, QObject *parent)
 	:QObject(parent)
 	,mPortShift(portShift)
+	,mSocket(socket)
 {
 	mRawServer = new RawServer((*mPortShift)+BASEPORT, this);
 	connect(mRawServer, SIGNAL(serverStart(quint16)), this, SLOT(rawServerStarted(quint16)));

@@ -12,12 +12,12 @@ RawServer::RawServer(quint32 port, QObject *parent)
 
 void RawServer::start()
 {
-	if (!mServer->listen(QHostAddress::Any,port))
+	if (!mServer->listen(QHostAddress::Any,mPort))
 	{
 		qWarning()<<"Server start failure";
 	}
 	NR::Log(QString("Raw server start %1").arg(mPort), 0);
-	emit serverStart(port);
+	emit serverStart(mPort);
 }
 
 RawServer::~RawServer()

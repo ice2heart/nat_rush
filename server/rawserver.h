@@ -18,6 +18,7 @@ signals:
 	void clientOut(quint8 clientId);
 	void serverStart(quint16 port);
 public slots:
+	void start();
 	void newConnection();
 
 	void readyRead();

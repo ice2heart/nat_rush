@@ -7,12 +7,16 @@ RawServer::RawServer(quint32 port, QObject *parent)
 {
 	buf = new char[BUFSIZE]();
 	mServer = new QTcpServer(this);
+	connect(mServer, SIGNAL(newConnection()), this, SLOT(newConnection()));
+}
+
+void RawServer::start()
+{
 	if (!mServer->listen(QHostAddress::Any,port))
 	{
 		qWarning()<<"Server start failure";
 	}
 	NR::Log(QString("Raw server start %1").arg(mPort), 0);
-	connect(mServer, SIGNAL(newConnection()), this, SLOT(newConnection()));
 	emit serverStart(port);
 }
 

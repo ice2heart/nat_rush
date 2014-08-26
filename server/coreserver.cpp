@@ -133,8 +133,7 @@ ConnectionStorage::ConnectionStorage(intPool::spItem portShift, QObject *parent)
 	connect(mRawServer, SIGNAL(newData(quint8,QByteArray)), this, SLOT(incomingData(quint8,QByteArray)));
 	connect(mRawServer, SIGNAL(clientIn(quint8)), this, SLOT(rawClientIn(quint8)));
 	connect(mRawServer, SIGNAL(clientOut(quint8)), this, SLOT(rawClientOut(quint8)));
-
-
+	mRawServer->start();
 }
 
 ConnectionStorage::~ConnectionStorage()
@@ -166,5 +165,5 @@ void ConnectionStorage::incomingData(quint8 clientId, const QByteArray &data)
 void ConnectionStorage::rawServerStarted(quint16 port)
 {
 	NR::Log(QString("Send info about port %1").arg(port), 3);
-	NR::writeToSocket(mSocket,RAWSERVERSTART, quint16(port));
+	NR::writeToSocket(mSocket, RAWSERVERSTART, quint16(port));
 }

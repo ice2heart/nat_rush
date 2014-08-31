@@ -19,6 +19,8 @@ CoreServer::CoreServer(QObject *parent)
 	if (!mMainServer->listen(QHostAddress::Any,mMainPort))
 	{
 		NR::Log("Server start failure");
+		NR::Log(QString("FATAL ERROR: %1").arg(mMainServer->errorString()));
+		exit(2);
 	}
 	NR::SetLogLvl(mLogLvl);
 	NR::Log("Ready!");

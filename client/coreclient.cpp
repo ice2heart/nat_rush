@@ -28,6 +28,7 @@ CoreClient::CoreClient(QObject *parent)
 	connect(mMainSocket, SIGNAL(readyRead()), this, SLOT(readyRead()));
 	connect(mMainSocket, SIGNAL(disconnected()), this, SLOT(disconnected()));
 	connect(mMainSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(error(QAbstractSocket::SocketError)));
+	tryConnect();
 }
 
 void CoreClient::tryConnect()

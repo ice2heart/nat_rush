@@ -9,6 +9,5 @@ int main(int argc, char *argv[])
 	mainWindow.show();
 	CoreClient cc;
 	QObject::connect(&cc, SIGNAL(connectionInfo(quint8,QString)), &mainWindow, SLOT(info(quint8,QString)));
-	cc.tryConnect();
 	return a.exec();
 }

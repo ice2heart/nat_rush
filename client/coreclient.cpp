@@ -15,11 +15,10 @@ CoreClient::CoreClient(QObject *parent)
 	mRawPort = setting.value("rawPort", 5900).toUInt();
 	quint8 logLvl = setting.value("logLevel", 0).toUInt();
 	mProcessName = setting.value("process","winvnc.exe").toString();
+	mProcessParam = setting.value("processArgs", "").toString();
 	if (mProcessName != "none")
 	{
-		QStringList arg;
-		arg << "-run";
-		vncProcess.start(mProcessName, arg);
+		vncProcess.start(mProcessName, mProcessParam.split(' '));
 		vncProcess.waitForStarted();
 	}
 	NR::SetLogLvl(logLvl);

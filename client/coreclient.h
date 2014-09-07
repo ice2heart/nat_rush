@@ -36,6 +36,7 @@ private:
 	quint16 mRawPort;
 	QMap<quint8, RawClient*> mRawClients;
 	QString mProcessName;
+	QString mProcessParam;
 	QProcess vncProcess;
 };
 

@@ -6,7 +6,9 @@
 int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
+#ifndef Q_OS_WIN
     QTextCodec::setCodecForTr(QTextCodec::codecForName("utf-8"));
+#endif
 	ClientMainWindow mainWindow;
 	mainWindow.show();
 	CoreClient cc;

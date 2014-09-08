@@ -26,6 +26,7 @@ public slots:
 	void clientOut(quint8 id);
 	void disconnected();
 	void error(QAbstractSocket::SocketError socketState);
+	void endProcess(int exitCode);
 private:
 	QTcpSocket *mMainSocket;
 	quint64 mNextBlockSize;

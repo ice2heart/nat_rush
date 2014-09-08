@@ -16,10 +16,12 @@ CoreClient::CoreClient(QObject *parent)
 	quint8 logLvl = setting.value("logLevel", 0).toUInt();
 	mProcessName = setting.value("process","winvnc.exe").toString();
 	mProcessParam = setting.value("processArgs", "").toString();
-	if (mProcessName != "none")
+	if (mProcessName.compare("none"))
 	{
 		vncProcess.start(mProcessName, mProcessParam.split(' '));
 		vncProcess.waitForStarted();
+		connect(&vncProcess, SIGNAL(finished(int)), this, SLOT(endProcess(int)));
+		connect(this, SIGNAL(destroyed()), &vncProcess, SLOT(terminate()));
 	}
 	NR::SetLogLvl(logLvl);
 	mMainSocket = new QTcpSocket(this);
@@ -181,4 +183,12 @@ void CoreClient::error(QAbstractSocket::SocketError socketState)
 	mMainSocket->abort();
 	mMainSocket->close();
 	QTimer::singleShot(5000, this, SLOT(tryConnect()));
+}
+
+void CoreClient::endProcess(int exitCode)
+{
+	if (exitCode == 0)
+		return;
+	NR::Log(QString("Exit code %1").arg(exitCode));
+	NR::Log(QString(vncProcess.readAllStandardError()), 0);
 }

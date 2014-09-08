@@ -6,8 +6,8 @@
 int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
-#ifndef Q_OS_WIN
-    QTextCodec::setCodecForTr(QTextCodec::codecForName("utf-8"));
+#if QT_VERSION <= QT_VERSION_CHECK(5, 0, 0)
+	QTextCodec::setCodecForTr(QTextCodec::codecForName("utf-8"));
 #endif
 	ClientMainWindow mainWindow;
 	mainWindow.show();

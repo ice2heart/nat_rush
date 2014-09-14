@@ -22,4 +22,15 @@ Server side
 LogLevel=3
 MainPort=6900
 ```
+#Mac OS specific
+Need make bundle.
+Add build steps
+```
+~/Qt/5.2.0/clang_64/bin/macdeployqt client.app
+cp config.ini client.app/Contents/MacOS/
+mkdir dmg
+cp -R client.app/ dmg/client.app
+hdiutil create -ov -srcfolder dmg/ -format UDRW -volname  client.dmg client.dmg
+```
+This add dependency and make dmg img.
 ![CC license](https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png)Creative Commons «Attribution-NonCommercial-ShareAlike»

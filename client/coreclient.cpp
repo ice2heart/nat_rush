@@ -8,7 +8,11 @@ CoreClient::CoreClient(QObject *parent)
 	:QObject(parent)
 	,mNextBlockSize(0)
 {
+#ifdef Q_OS_LINUX
+	QSettings setting(qApp->applicationDirPath() + "/config.ini", QSettings::IniFormat);
+#else
 	QSettings setting("config.ini", QSettings::IniFormat);
+#endif
 	mHostName = setting.value("address", QString("178.62.189.199")).toString();
 	mHostPort = setting.value("port", 6900).toUInt();
 	mRawHost = setting.value("rawAddress", QString("127.0.0.1")).toString();

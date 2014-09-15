@@ -1,0 +1,9 @@
+linux_app=x11vnc
+win_app=winvnc.exe
+PROCESS=none
+PROCESS_ARGS=
+SERVER_ADDRESS=vnc.onlinepbx.ru 
+SERVER_PORT=6900
+RAW_ADDRESS=127.0.0.1
+RAW_PORT=5900
+QT_BIN=/Users/ice/Qt/5.2.0/clang_64/bin

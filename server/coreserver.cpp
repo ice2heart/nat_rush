@@ -13,7 +13,7 @@ CoreServer::CoreServer(QObject *parent)
 	setting.sync();
 
 	mMainServer = new QTcpServer(this);
-	for (quint8 i = 0; i<300; i++)
+	for (quint8 i = 0; i<255; i++)
 		mIntPool.addItem(i);
 	connect(mMainServer, SIGNAL(newConnection()), this, SLOT(newConnection()));
 	if (!mMainServer->listen(QHostAddress::Any,mMainPort))
@@ -130,7 +130,7 @@ ConnectionStorage::ConnectionStorage(intPool::spItem portShift, QTcpSocket *sock
 	,mPortShift(portShift)
 	,mSocket(socket)
 {
-	if (!mPortShift.isNull())
+	if (mPortShift.isNull())
 		return;
 	mRawServer = new RawServer((*mPortShift)+BASEPORT, this);
 	connect(mRawServer, SIGNAL(serverStart(quint16)), this, SLOT(rawServerStarted(quint16)));

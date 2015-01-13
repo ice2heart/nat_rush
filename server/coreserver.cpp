@@ -132,7 +132,7 @@ ConnectionStorage::ConnectionStorage(intPool::spItem portShift, QTcpSocket *sock
 {
 	if (mPortShift.isNull())
 		return;
-	mRawServer = new RawServer((*mPortShiftp)+BASEPORT, this);
+	mRawServer = new RawServer((*mPortShift)+BASEPORT, this);
 	connect(mRawServer, SIGNAL(serverStart(quint16)), this, SLOT(rawServerStarted(quint16)));
 	connect(mRawServer, SIGNAL(newData(quint8,QByteArray)), this, SLOT(incomingData(quint8,QByteArray)));
 	connect(mRawServer, SIGNAL(clientIn(quint8)), this, SLOT(rawClientIn(quint8)));

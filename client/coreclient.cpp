@@ -8,7 +8,11 @@ CoreClient::CoreClient(QObject *parent)
 	:QObject(parent)
 	,mNextBlockSize(0)
 {
+#ifdef Q_OS_LINUX
+	QSettings setting(qApp->applicationDirPath() + "/config.ini", QSettings::IniFormat);
+#else
 	QSettings setting("config.ini", QSettings::IniFormat);
+#endif
 	mHostName = setting.value("address", QString("178.62.189.199")).toString();
 	mHostPort = setting.value("port", 6900).toUInt();
 	mRawHost = setting.value("rawAddress", QString("127.0.0.1")).toString();
@@ -16,10 +20,12 @@ CoreClient::CoreClient(QObject *parent)
 	quint8 logLvl = setting.value("logLevel", 0).toUInt();
 	mProcessName = setting.value("process","winvnc.exe").toString();
 	mProcessParam = setting.value("processArgs", "").toString();
-	if (mProcessName != "none")
+	if (mProcessName.compare("none"))
 	{
 		vncProcess.start(mProcessName, mProcessParam.split(' '));
 		vncProcess.waitForStarted();
+		connect(&vncProcess, SIGNAL(finished(int)), this, SLOT(endProcess(int)));
+		connect(this, SIGNAL(destroyed()), &vncProcess, SLOT(terminate()));
 	}
 	NR::SetLogLvl(logLvl);
 	mMainSocket = new QTcpSocket(this);
@@ -181,4 +187,12 @@ void CoreClient::error(QAbstractSocket::SocketError socketState)
 	mMainSocket->abort();
 	mMainSocket->close();
 	QTimer::singleShot(5000, this, SLOT(tryConnect()));
+}
+
+void CoreClient::endProcess(int exitCode)
+{
+	if (exitCode == 0)
+		return;
+	NR::Log(QString("Exit code %1").arg(exitCode));
+	NR::Log(QString(vncProcess.readAllStandardError()), 0);
 }

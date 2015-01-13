@@ -3,3 +3,4 @@ Makefile
 moc_*.cpp
 moc_*.o
 *.o
+preference.conf

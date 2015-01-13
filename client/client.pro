@@ -7,11 +7,8 @@
 QT       += gui network widgets
 
 TARGET = client
-CONFIG   -= app_bundle
 
 TEMPLATE = app
-
-#INCLUDEPATH += ../common
 
 SOURCES += main.cpp \
     coreclient.cpp \

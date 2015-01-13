@@ -130,7 +130,7 @@ ConnectionStorage::ConnectionStorage(intPool::spItem portShift, QTcpSocket *sock
 	,mPortShift(portShift)
 	,mSocket(socket)
 {
-	if (mPortShift.isNull())
+	if (!mPortShift.isNull())
 		return;
 	mRawServer = new RawServer((*mPortShift)+BASEPORT, this);
 	connect(mRawServer, SIGNAL(serverStart(quint16)), this, SLOT(rawServerStarted(quint16)));

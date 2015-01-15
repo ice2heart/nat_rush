@@ -97,7 +97,7 @@ void CoreServer::disconnected()
 {
 	NR::Log("Client gone");
 	QTcpSocket *socket = (QTcpSocket *) sender();
-	mIntPool.release(mCoreClients[socket]);
+	mIntPool.release(mCoreClients[socket]->mPortShift);
 	mCoreClients.remove(socket);
 	genListConnection();
 }

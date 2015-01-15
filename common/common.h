@@ -58,5 +58,5 @@ private:
 };
 }
 
-typedef NR::Pool<quint8> intPool;
+typedef NR::Pool<quint16> intPool;
 #endif // COMMON_H

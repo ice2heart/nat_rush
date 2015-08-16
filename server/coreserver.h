@@ -37,7 +37,7 @@ public slots:
 	void newConnection();
 	void readyRead();
 	void disconnected();
-	void sendText(QTcpSocket *socket, const QString &text);
+	void sendText(QTcpSocket *socket, quint8 num);
 	void sendError(QTcpSocket *socket, const QString &reason);
 	void genListConnection();
 private:

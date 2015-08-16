@@ -7,7 +7,7 @@
 #include <QSharedPointer>
 #include <QMap>
 
-const static quint32 BUFSIZE = 5000;
+const static quint32 BUFSIZE = 10000;
 const static quint16 BASEPORT = 7000;
 const static quint8 SERVERSTART = 2;
 const static quint8 CLIENTIN = 3;
@@ -31,10 +31,27 @@ struct connData
 
 namespace NR {
 
-void writeToSocket(QTcpSocket *client, quint8 type, const QByteArray &qba);
-void writeToSocket(QTcpSocket *client, quint8 type, quint8 data);
-void writeToSocket(QTcpSocket *client, quint8 type, quint16 data);
-void writeToSocket(QTcpSocket *client, quint8 type, const QString &str);
+template<typename T> void writeToSocket(QTcpSocket *client, quint8 type, quint32 size, const T &data)
+{
+	QByteArray qba;
+	QDataStream out(&qba, QIODevice::WriteOnly);
+
+	out.setVersion(QDataStream::Qt_5_4);
+	out << quint64(size + sizeof(quint8)) << quint8(type) << data;
+
+	client->write(qba);
+}
+
+template<typename T1, typename T2> void writeToSocket(QTcpSocket *client, quint8 type, quint32 size, const T1 &data, const T2 &data2)
+{
+	QByteArray qba;
+	QDataStream out(&qba, QIODevice::WriteOnly);
+
+	out.setVersion(QDataStream::Qt_5_4);
+	out << quint64(size + sizeof(quint8)) << quint8(type) << data << data2;
+
+	client->write(qba);
+}
 
 void Log(const QString &msg, quint8 logLvl = 0);
 void SetLogLvl(quint8 logLvl);

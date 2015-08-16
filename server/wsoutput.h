@@ -2,19 +2,21 @@
 #define WSOUTPUT_H
 
 #include "../common/common.h"
-#include "QWsServer.h"
-#include "QWsSocket.h"
 #include <QStringList>
+
+
+QT_FORWARD_DECLARE_CLASS(QWebSocketServer)
+QT_FORWARD_DECLARE_CLASS(QWebSocket)
 
 class WSOutput : public QObject
 {
 	Q_OBJECT
 public:
-	explicit WSOutput(int port = 80, QtWebsocket::Protocol protocol = QtWebsocket::Tcp, QObject *parent = 0);
+	explicit WSOutput(int port = 80, QObject *parent = 0);
 public slots:
 	void listConnection(const QVector<connData> &data);
 private slots:
-	void sendToRawClient(QtWebsocket::QWsSocket *pSocket, const QString &str);
+	void sendToRawClient(QWebSocket *pSocket, const QString &str);
 	void processPong(quint64 elapsedTime);
 
 	void sendToClient(int id, const QString &str);
@@ -26,8 +28,8 @@ private slots:
 signals:
 	void getList();
 private:
-	QtWebsocket::QWsServer* server;
-	QMap<QtWebsocket::QWsSocket*, int> clients;
+	QWebSocketServer* server;
+	QMap<QWebSocket*, int> clients;
 	int mIncr;
 //FIX ME
 };

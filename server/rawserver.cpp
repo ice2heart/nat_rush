@@ -5,7 +5,6 @@ RawServer::RawServer(quint32 port, QObject *parent)
 	:QObject(parent)
 	,mPort(port)
 {
-	buf = new char[BUFSIZE]();
 	mServer = new QTcpServer(this);
 	connect(mServer, SIGNAL(newConnection()), this, SLOT(newConnection()));
 }
@@ -44,26 +43,7 @@ void RawServer::readyRead()
 		qWarning()<<"RawServer write to empty socket";
 		return;
 	}
-	if (socket->bytesAvailable() <= 0)
-		return;
-	QDataStream in(socket);
-	quint64 ba = socket->bytesAvailable();
-	QByteArray temp;
-	while (ba != 0)
-	{
-		if (ba > BUFSIZE)
-		{
-			in.readRawData(buf, BUFSIZE);
-			ba -= BUFSIZE;
-			temp.append(buf, BUFSIZE);
-		}
-		else
-		{
-			in.readRawData(buf, ba);
-			temp.append(buf, ba);
-			ba = 0;
-		}
-	}
+	QByteArray temp = socket->readAll();
 	emit newData(mSockets[socket], temp);
 }
 

@@ -21,26 +21,10 @@ void RawClient::connected()
 
 void RawClient::readyRead()
 {
-	if(Q_UNLIKELY(mSocket->bytesAvailable() <= 0))
-		return;
+	qDebug()<<__FUNCTION__<<mSocket->bytesAvailable();
 	QDataStream in(mSocket);
 	int ba = mSocket->bytesAvailable();
-	QByteArray tempBa;
-	while (ba != 0)
-	{
-		if (ba > BUFSIZE)
-		{
-			in.readRawData(buf, BUFSIZE);
-			tempBa.append(buf, BUFSIZE);
-			ba -= BUFSIZE;
-		}
-		else
-		{
-			in.readRawData(buf, ba);
-			tempBa.append(buf, ba);
-			ba = 0;
-		}
-	}
+	QByteArray tempBa = mSocket->readAll();
 	emit newData(mId, tempBa);
 }
 

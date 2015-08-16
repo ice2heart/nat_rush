@@ -70,7 +70,7 @@ void CoreServer::readyRead()
 		switch (command) {
 		case TEXTDATA:
 			in >> conNum;
-			sendText(socket, QString::number(++ii));
+			sendText(socket, ++ii);
 			break;
 		case PROTODATA:
 			in >> version;
@@ -102,15 +102,15 @@ void CoreServer::disconnected()
 	genListConnection();
 }
 
-void CoreServer::sendText(QTcpSocket *socket, const QString &text)
+void CoreServer::sendText(QTcpSocket *socket, quint8 num)
 {
-	NR::writeToSocket(socket, TEXTDATA, text);
+	NR::writeToSocket<quint8>(socket, TEXTDATA, sizeof(quint8), num);
 }
 
 void CoreServer::sendError(QTcpSocket *socket, const QString &reason)
 {
 	NR::Log(QString("ERROR: Send error msg reason: %1").arg(reason));
-	NR::writeToSocket(socket, ERRORMSG, reason);
+	NR::writeToSocket<QString>(socket, ERRORMSG, sizeof(reason), reason);
 }
 
 void CoreServer::genListConnection()
@@ -147,27 +147,22 @@ ConnectionStorage::~ConnectionStorage()
 void ConnectionStorage::rawClientIn(quint8 id)
 {
 	NR::Log(QString("Client in %1").arg(id), 3);
-	NR::writeToSocket(mSocket,CLIENTIN, id);
+	NR::writeToSocket<quint8>(mSocket,CLIENTIN, sizeof(quint8), id);
 }
 
 void ConnectionStorage::rawClientOut(quint8 id)
 {
 	NR::Log(QString("Client out %1").arg(id), 3);
-	NR::writeToSocket(mSocket,CLIENTOUT, id);
+	NR::writeToSocket<quint8>(mSocket,CLIENTOUT, sizeof(quint8), id);
 }
 
 void ConnectionStorage::incomingData(quint8 clientId, const QByteArray &data)
 {
-	QByteArray dataBlock;
-	QDataStream out(&dataBlock, QIODevice::WriteOnly);
-	out.setVersion(QDataStream::Qt_4_6);
-	out << quint8(clientId) << data;
-
-	NR::writeToSocket(mSocket, RAWDATA, dataBlock);
+	NR::writeToSocket<quint8, QByteArray>(mSocket, RAWDATA, sizeof(quint8) + data.size(), clientId, data);
 }
 
 void ConnectionStorage::rawServerStarted(quint16 port)
 {
 	NR::Log(QString("Send info about port %1").arg(port), 3);
-	NR::writeToSocket(mSocket, RAWSERVERSTART, quint16(port));
+	NR::writeToSocket<quint16>(mSocket, RAWSERVERSTART, sizeof(quint16), quint16(port));
 }

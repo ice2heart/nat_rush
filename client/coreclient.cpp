@@ -102,8 +102,11 @@ void CoreClient::readyRead()
 			in >> clientId;
 			in >> tempBa;
 			if (mRawClients.contains(clientId))
+			{
 				mRawClients[clientId]->sendRawData(tempBa);
+			}
 			NR::Log(QString("Incoming rawdata size %1").arg(tempBa.length()), 6);
+
 		default:
 			break;
 		}
@@ -116,12 +119,12 @@ void CoreClient::test()
 	if (!mMainSocket)
 		return;
 
-	NR::writeToSocket(mMainSocket, TEXTDATA, quint8(0));
+	NR::writeToSocket<quint8>(mMainSocket, TEXTDATA, sizeof(quint8), quint8(0));
 }
 
 void CoreClient::sendVersion()
 {
-	NR::writeToSocket(mMainSocket, PROTODATA, gCurrentVersion);
+	NR::writeToSocket<quint8>(mMainSocket, PROTODATA, sizeof(quint8), gCurrentVersion);
 }
 
 
@@ -130,13 +133,8 @@ void CoreClient::incomingData(quint8 id, const QByteArray &data)
 	if (!mMainSocket)
 		return;
 
-	QByteArray dataBlock;
-	QDataStream out(&dataBlock, QIODevice::WriteOnly);
-	out.setVersion(QDataStream::Qt_4_6);
-	out << quint8(id) << data;
+	NR::writeToSocket<quint8, QByteArray>(mMainSocket, RAWDATA, sizeof(quint8) + data.size(), id, data);
 
-	NR::Log(QString("Send raw bytes size %1").arg(dataBlock.size()), 6);
-	NR::writeToSocket(mMainSocket, RAWDATA, dataBlock);
 }
 
 void CoreClient::clientIn(quint8 id)
@@ -154,7 +152,6 @@ void CoreClient::clientOut(quint8 id)
 
 void CoreClient::disconnected()
 {
-	//qApp->exit();
 	mMainSocket->abort();
 	mMainSocket->close();
 }

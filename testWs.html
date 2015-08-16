@@ -5,19 +5,19 @@
 <script>
 
 function PItem(data) {
-	this.connIp = ko.observable(data['ip']);
+    this.connIp = ko.observable(data['ip']);
     this.connPort = ko.observable(data['port']);
     this.connId = ko.observable(data['id']);
     this.connStr = ko.computed(function() {
         return  'Id '+this.connId() +'  '+ this.connIp() +'<br>'+'178.62.189.199:' + this.connPort();
     }, this);
-}
+}   
 function ConnectionListViewModel() {
     // Data
     var self = this;
     self.connections = ko.observableArray([]);
- 	wsUri = 'ws://178.62.189.199:8080/';
-	self.websocket = new WebSocket(wsUri);
+    wsUri = 'ws://localhost:8080/ws';
+    self.websocket = new WebSocket(wsUri);
     self.websocket.onmessage = function(evt) {
       self.updateList($.parseJSON(evt.data));
     };
@@ -26,11 +26,17 @@ function ConnectionListViewModel() {
     };
 
     self.updateList = function(allData) {
-            var mappedPl = $.map(allData['data'], function(item) { return new PItem(item)});
+            var mappedPl = $.map(allData['data'], function(item) { return new PItem(item);});
             self.connections(mappedPl);
-    }
+    };
     
 }
+
+$( document ).ready( function() {
+
+ko.applyBindings(new ConnectionListViewModel());
+
+});
 
 //Вот этот кусок кода нужен для правильного старта нокаута
 $( document ).ready( function() {

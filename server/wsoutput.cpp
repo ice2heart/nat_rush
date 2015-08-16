@@ -2,10 +2,13 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QJsonArray>
+#include "QtWebSockets/qwebsocketserver.h"
+#include "QtWebSockets/qwebsocket.h"
 
-WSOutput::WSOutput(int port, QtWebsocket::Protocol protocol, QObject *parent)
+WSOutput::WSOutput(int port, QObject *parent)
 	:QObject(parent)
-	, server(new QtWebsocket::QWsServer(this, protocol))
+	, server(new QWebSocketServer(QStringLiteral("Echo Server"),
+								QWebSocketServer::NonSecureMode, this))
 	,mIncr(0)
 {
 	if (! server->listen(QHostAddress::Any, port))
@@ -17,7 +20,7 @@ WSOutput::WSOutput(int port, QtWebsocket::Protocol protocol, QObject *parent)
 	{
 		qDebug() << tr("Server is listening on port %1").arg(port);
 	}
-	connect(server, &QtWebsocket::QWsServer::newConnection, this, &WSOutput::newConection);
+	connect(server, &QWebSocketServer::newConnection, this, &WSOutput::newConection);
 }
 
 void WSOutput::listConnection(const QVector<connData> &data)
@@ -38,9 +41,9 @@ void WSOutput::listConnection(const QVector<connData> &data)
 	sendAll(output);
 }
 
-void WSOutput::sendToRawClient(QtWebsocket::QWsSocket *pSocket, const QString &str)
+void WSOutput::sendToRawClient(QWebSocket *pSocket, const QString &str)
 {
-	pSocket->write(str);
+	pSocket->sendTextMessage(str);
 }
 
 void WSOutput::processPong(quint64 elapsedTime)
@@ -55,7 +58,7 @@ void WSOutput::sendToClient(int id, const QString &str)
 
 void WSOutput::sendAll(const QString &str)
 {
-	foreach(QtWebsocket::QWsSocket *pClientSocket, clients.keys())
+	foreach(QWebSocket *pClientSocket, clients.keys())
 	{
 		sendToRawClient(pClientSocket, str);
 	}
@@ -63,11 +66,11 @@ void WSOutput::sendAll(const QString &str)
 
 void WSOutput::newConection()
 {
-	QtWebsocket::QWsSocket* clientSocket = server->nextPendingConnection();
-	connect(clientSocket, &QtWebsocket::QWsSocket::disconnected, this, &WSOutput::endConection);
-	connect(clientSocket, &QtWebsocket::QWsSocket::pong, this, &WSOutput::processPong);
+	QWebSocket* clientSocket = server->nextPendingConnection();
+	connect(clientSocket, &QWebSocket::disconnected, this, &WSOutput::endConection);
+	connect(clientSocket, &QWebSocket::pong, this, &WSOutput::processPong);
 	//Бладж не перегружайте слоты!
-	connect(clientSocket, static_cast<void (QtWebsocket::QWsSocket::*)(QString)>(&QtWebsocket::QWsSocket::frameReceived),
+	connect(clientSocket, &QWebSocket::textMessageReceived,
 			this, &WSOutput::readClient);
 	clients.insert(clientSocket, ++mIncr);
 	emit getList();
@@ -75,7 +78,7 @@ void WSOutput::newConection()
 
 void WSOutput::readClient(QString frame)
 {
-	QtWebsocket::QWsSocket* socket = qobject_cast<QtWebsocket::QWsSocket*>(sender());
+	QWebSocket* socket = qobject_cast<QWebSocket*>(sender());
 	emit getList();
 	//sendToRawClient(socket, tr("ok"));
 
@@ -83,9 +86,9 @@ void WSOutput::readClient(QString frame)
 
 void WSOutput::endConection()
 {
-	QtWebsocket::QWsSocket* socket = qobject_cast<QtWebsocket::QWsSocket*>(sender());
+	QWebSocket* socket = qobject_cast<QWebSocket*>(sender());
 
-	int key = clients[socket];
+	//int key = clients[socket];
 	socket->deleteLater();
 	clients.remove(socket);
 
